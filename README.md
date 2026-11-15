@@ -1,10 +1,6 @@
 # PairBack — Coding Assignment 2
 
-Proponents: Aidan Brent C. Tanlimco and Rob Jared S. Viceral.
-Filename prefix: TanlimcoViceral (change all submission filenames if your official group name differs).
-
 ## Run
-Install Python 3.9 or newer. No additional packages are needed.
 Extract this folder, open a terminal there, and run:
 
 ```sh
@@ -32,13 +28,3 @@ Matching, browser screens, persistence and CSV export are outside this assignmen
 Four automated tests cover growth to 1,000 entries, order preservation, stack
 LIFO behavior, peek without removal, empty operations, invalid indexes,
 duplicate IDs, blank fields, missing records, repeated releases and undo.
-
-## Submission still requires your group materials
-This is a preparation bundle, not a complete submission ZIP.
-Add your completed course COA as TanlimcoViceral_COA.pdf and record your own
-walkthrough as TanlimcoViceral_Video.mp4. The official COA template was not
-provided, so no declaration or signatures have been generated.
-Use DEMO_SCRIPT.md to keep the recording under three minutes.
-Final ZIP: COA PDF, Code.py, Video.mp4 and this README. The script is optional.
-Review and understand the implementation and follow your course's assistance
-disclosure requirements when completing the COA.
