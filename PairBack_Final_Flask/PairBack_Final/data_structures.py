@@ -1,6 +1,9 @@
-"""PairBack's student-implemented data structures and algorithms."""
+"""Student-implemented data structures and algorithms for PairBack."""
+
+
 class ArrayList:
-    """Resizable array with explicit size/capacity and indexed access."""
+    """Resizable array with explicit size, capacity, and indexed access."""
+
     def __init__(self, values=None):
         self.capacity = 2
         self._size = 0
@@ -9,9 +12,13 @@ class ArrayList:
             for value in values:
                 self.append(value)
 
-    def __len__(self): return self._size
+    def __len__(self):
+        return self._size
+
     def __iter__(self):
-        for i in range(self._size): yield self._data[i]
+        for index in range(self._size):
+            yield self._data[index]
+
     def __getitem__(self, index):
         if not isinstance(index, int) or index < 0 or index >= self._size:
             raise IndexError("Index outside stored records")
@@ -21,54 +28,157 @@ class ArrayList:
         if self._size == self.capacity:
             self.capacity *= 2
             larger = [None] * self.capacity
-            for i in range(self._size): larger[i] = self._data[i]
+            for index in range(self._size):
+                larger[index] = self._data[index]
             self._data = larger
         self._data[self._size] = value
         self._size += 1
 
     def pop_last(self):
-        if self._size == 0: raise IndexError("Array is empty")
+        if self._size == 0:
+            raise IndexError("Array is empty")
         self._size -= 1
         value = self._data[self._size]
         self._data[self._size] = None
         return value
 
-    def to_list(self): return [self._data[i] for i in range(self._size)]
+    def to_list(self):
+        return [self._data[index] for index in range(self._size)]
 
 
 class UndoStack:
-    """Explicit LIFO stack backed by PairBack's ArrayList."""
-    def __init__(self): self._items = ArrayList()
-    def __len__(self): return len(self._items)
-    def isEmpty(self): return len(self) == 0
-    def push(self, change): self._items.append(change)
-    def peek(self): return None if self.isEmpty() else self._items[len(self)-1]
-    def pop(self): return None if self.isEmpty() else self._items.pop_last()
+    """LIFO stack backed by PairBack's ArrayList."""
+
+    def __init__(self):
+        self._items = ArrayList()
+
+    def __len__(self):
+        return len(self._items)
+
+    def is_empty(self):
+        return len(self) == 0
+
+    def push(self, change):
+        self._items.append(change)
+
+    def peek(self):
+        return None if self.is_empty() else self._items[len(self) - 1]
+
+    def pop(self):
+        return None if self.is_empty() else self._items.pop_last()
 
 
-def merge_sort(items, key):
-    """Recursive merge sort; stable ordering; returns a new Python list."""
-    if len(items) <= 1: return list(items)
-    middle = len(items) // 2
-    left = merge_sort(items[:middle], key)
-    right = merge_sort(items[middle:], key)
-    merged, i, j = [], 0, 0
-    while i < len(left) and j < len(right):
-        if key(left[i]) <= key(right[j]):
-            merged.append(left[i]); i += 1
+def quick_sort(items, key):
+    """Return a new list ordered with recursive three-way Quick Sort.
+
+    The middle element is used as the pivot. Equal keys are kept together,
+    which avoids unnecessary recursive calls when many records share a key.
+    """
+    values = list(items)
+    if len(values) <= 1:
+        return values
+
+    pivot_key = key(values[len(values) // 2])
+    lower = []
+    equal = []
+    higher = []
+
+    for value in values:
+        value_key = key(value)
+        if value_key < pivot_key:
+            lower.append(value)
+        elif value_key > pivot_key:
+            higher.append(value)
         else:
-            merged.append(right[j]); j += 1
-    merged.extend(left[i:]); merged.extend(right[j:])
-    return merged
+            equal.append(value)
+
+    return quick_sort(lower, key) + equal + quick_sort(higher, key)
 
 
-def binary_search(sorted_records, target_id):
-    """Iterative binary search over records sorted by report_id."""
-    low, high = 0, len(sorted_records) - 1
-    while low <= high:
-        mid = (low + high) // 2
-        current = sorted_records[mid]["report_id"]
-        if current == target_id: return sorted_records[mid]
-        if current < target_id: low = mid + 1
-        else: high = mid - 1
-    return None
+class MaxHeap:
+    """Max heap used as a priority queue for match candidates.
+
+    The supplied higher_priority function returns True when its first
+    argument should appear before its second argument.
+    """
+
+    def __init__(self, higher_priority):
+        self._items = []
+        self._higher_priority = higher_priority
+
+    def __len__(self):
+        return len(self._items)
+
+    def is_empty(self):
+        return len(self._items) == 0
+
+    def peek(self):
+        return None if self.is_empty() else self._items[0]
+
+    def push(self, value):
+        self._items.append(value)
+        self._sift_up(len(self._items) - 1)
+
+    def pop(self):
+        if self.is_empty():
+            return None
+
+        highest = self._items[0]
+        last = self._items.pop()
+        if self._items:
+            self._items[0] = last
+            self._sift_down(0)
+        return highest
+
+    def _sift_up(self, index):
+        while index > 0:
+            parent = (index - 1) // 2
+            if not self._higher_priority(self._items[index], self._items[parent]):
+                break
+            self._items[index], self._items[parent] = (
+                self._items[parent],
+                self._items[index],
+            )
+            index = parent
+
+    def _sift_down(self, index):
+        size = len(self._items)
+        while True:
+            left = 2 * index + 1
+            right = left + 1
+            best = index
+
+            if (
+                left < size
+                and self._higher_priority(self._items[left], self._items[best])
+            ):
+                best = left
+            if (
+                right < size
+                and self._higher_priority(self._items[right], self._items[best])
+            ):
+                best = right
+            if best == index:
+                return
+
+            self._items[index], self._items[best] = (
+                self._items[best],
+                self._items[index],
+            )
+            index = best
+
+
+def heap_sort(items, higher_priority):
+    """Return items in priority order using a student-built Max Heap.
+
+    Inserting all values and repeatedly removing the heap root performs the
+    complete ranking without calling Python's built-in sorted function.
+    """
+    heap = MaxHeap(higher_priority)
+    for item in items:
+        heap.push(item)
+
+    ordered = []
+    while not heap.is_empty():
+        ordered.append(heap.pop())
+    return ordered

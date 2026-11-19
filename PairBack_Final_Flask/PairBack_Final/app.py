@@ -1,90 +1,215 @@
-from flask import Flask, render_template, request, redirect, url_for, flash, send_file
-from pairback import PairBack, FIELDS
-from pathlib import Path
-import io, csv
+import csv
+import io
+
+from flask import (
+    Flask,
+    flash,
+    redirect,
+    render_template,
+    request,
+    send_file,
+    url_for,
+)
+
+from pairback import FIELDS, PairBack
+
 
 app = Flask(__name__)
 app.secret_key = "pairback-local-demo-secret"
 store = PairBack()
 
+
 @app.context_processor
 def inject_globals():
-    return {"undo_count":len(store.history)}
+    return {"undo_count": len(store.history)}
+
 
 @app.get("/")
 def dashboard():
     records = store.all_records()
-    lost = sum(r["report_type"]=="Lost" for r in records)
-    found = sum(r["report_type"]=="Found" for r in records)
-    available = sum(r["report_type"]=="Found" and r["status"]=="available" for r in records)
-    released = sum(r["status"] in ("released","resolved") for r in records)
-    return render_template("dashboard.html", records=records[-6:][::-1],
-                           stats={"total":len(records),"lost":lost,"found":found,
-                                  "available":available,"released":released})
+    lost = sum(record["report_type"] == "Lost" for record in records)
+    found = sum(record["report_type"] == "Found" for record in records)
+    available = sum(
+        record["report_type"] == "Found"
+        and record["status"] == "available"
+        for record in records
+    )
+    completed = sum(
+        record["status"] in {"released", "resolved"}
+        for record in records
+    )
+    return render_template(
+        "dashboard.html",
+        records=records[-6:][::-1],
+        stats={
+            "total": len(records),
+            "lost": lost,
+            "found": found,
+            "available": available,
+            "released": completed,
+        },
+    )
+
 
 @app.get("/records")
 def records():
-    q=request.args.get("q","").strip().casefold()
-    kind=request.args.get("type","")
-    status=request.args.get("status","")
-    items=store.all_records()
-    if q: items=[r for r in items if q in " ".join(str(v) for v in r.values()).casefold()]
-    if kind: items=[r for r in items if r["report_type"]==kind]
-    if status: items=[r for r in items if r["status"]==status]
-    items=sorted(items,key=lambda r:r["report_id"])
-    return render_template("records.html", records=items, q=q, kind=kind, status=status)
+    query = request.args.get("q", "").strip().casefold()
+    report_type = request.args.get("type", "")
+    status = request.args.get("status", "")
+    items = store.all_records()
 
-@app.route("/reports/new", methods=["GET","POST"])
+    if query:
+        items = [
+            record
+            for record in items
+            if query
+            in " ".join(str(value) for value in record.values()).casefold()
+        ]
+    if report_type:
+        items = [
+            record
+            for record in items
+            if record["report_type"] == report_type
+        ]
+    if status:
+        items = [
+            record for record in items if record["status"] == status
+        ]
+
+    # Final-project algorithm 1: student-implemented Quick Sort.
+    items = store.sorted_records(items)
+    return render_template(
+        "records.html",
+        records=items,
+        q=query,
+        kind=report_type,
+        status=status,
+    )
+
+
+@app.route("/reports/new", methods=["GET", "POST"])
 def new_report():
-    if request.method=="POST":
+    if request.method == "POST":
         try:
-            record=store.add(request.form)
-            flash(f"Report {record['report_id']} added successfully.","success")
+            record = store.add(request.form)
+            flash(
+                f"Report {record['report_id']} added successfully.",
+                "success",
+            )
             return redirect(url_for("records"))
-        except ValueError as e: flash(str(e),"error")
+        except ValueError as error:
+            flash(str(error), "error")
     return render_template("new_report.html")
+
 
 @app.get("/matching")
 def matching():
-    lost=[r for r in store.all_records() if r["report_type"]=="Lost"]
-    selected=request.args.get("lost_id","")
-    results=[]
+    lost_reports = [
+        record
+        for record in store.sorted_records()
+        if record["report_type"] == "Lost"
+        and record["status"] == "open"
+    ]
+    selected = request.args.get("lost_id", "")
+    results = []
     if selected:
-        try: results=store.matches(selected)
-        except ValueError as e: flash(str(e),"error")
-    return render_template("matching.html", lost=lost, selected=selected, results=results)
+        try:
+            # Final-project algorithm 2: Heap Sort candidate ranking.
+            results = store.matches(selected)
+        except ValueError as error:
+            flash(str(error), "error")
+    return render_template(
+        "matching.html",
+        lost=lost_reports,
+        selected=selected,
+        results=results,
+    )
+
 
 @app.get("/search")
 def search():
-    query=request.args.get("id","").strip()
-    result=store.find(query) if query else None
-    return render_template("search.html", query=query, result=result, searched=bool(query))
+    query = request.args.get("id", "").strip()
+    result = store.find(query) if query else None
+    return render_template(
+        "search.html",
+        query=query,
+        result=result,
+        searched=bool(query),
+    )
+
 
 @app.post("/records/<report_id>/status")
 def update_status(report_id):
     try:
-        changed=store.set_status(report_id,request.form.get("status",""))
-        flash("Status updated." if changed else "No change was needed.","success")
-    except ValueError as e: flash(str(e),"error")
+        changed = store.set_status(
+            report_id,
+            request.form.get("status", ""),
+        )
+        flash(
+            "Status updated."
+            if changed
+            else "No change was needed.",
+            "success",
+        )
+    except ValueError as error:
+        flash(str(error), "error")
     return redirect(request.referrer or url_for("records"))
+
+
+@app.post("/records/<report_id>/release")
+def release_item(report_id):
+    try:
+        store.release(
+            report_id=report_id,
+            valid_id_confirmed=request.form.get("valid_id") == "yes",
+            proof_confirmed=(
+                request.form.get("proof_of_ownership") == "yes"
+            ),
+            release_location=request.form.get("release_location", ""),
+        )
+        flash(
+            f"{report_id} was released through the verified MVP 101 process.",
+            "success",
+        )
+    except ValueError as error:
+        flash(str(error), "error")
+    return redirect(request.referrer or url_for("matching"))
+
 
 @app.post("/undo")
 def undo():
-    change=store.undo()
-    flash(f"Restored {change['report_id']} to {change['previous']}." if change else "There is nothing to undo.",
-          "success" if change else "error")
+    change = store.undo()
+    if change:
+        flash(
+            f"Restored {change['report_id']} to {change['previous']}.",
+            "success",
+        )
+    else:
+        flash("There is nothing to undo.", "error")
     return redirect(request.referrer or url_for("dashboard"))
+
 
 @app.get("/export")
 def export():
-    output=io.StringIO()
-    writer=csv.DictWriter(output,fieldnames=FIELDS)
-    writer.writeheader(); writer.writerows(store.all_records())
-    mem=io.BytesIO(output.getvalue().encode("utf-8-sig")); mem.seek(0)
-    return send_file(mem,mimetype="text/csv",as_attachment=True,download_name="pairback_records.csv")
+    output = io.StringIO()
+    writer = csv.DictWriter(output, fieldnames=FIELDS)
+    writer.writeheader()
+    writer.writerows(store.all_records())
+
+    memory_file = io.BytesIO(output.getvalue().encode("utf-8-sig"))
+    memory_file.seek(0)
+    return send_file(
+        memory_file,
+        mimetype="text/csv",
+        as_attachment=True,
+        download_name="pairback_records.csv",
+    )
+
 
 @app.get("/health")
-def health(): return {"status":"ok","records":len(store.records)}
+def health():
+    return {"status": "ok", "records": len(store.records)}
 
-if __name__=="__main__":
+
+if __name__ == "__main__":
     app.run(debug=True)

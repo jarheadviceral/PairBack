@@ -1,6 +1,117 @@
-{% extends "base.html" %}{% block title %}All records{% endblock %}{% block heading %}All records{% endblock %}
-{% block content %}<div class="section-head"><div><h3>Report directory</h3><p>Search, filter, and update campus lost-and-found records.</p></div><a class="button outline" href="/export">⇩ Export CSV</a></div>
-<form class="filterbar" method="get"><input name="q" value="{{q}}" placeholder="Search ID, item, brand, location…"><select name="type"><option value="">All types</option><option {{'selected' if kind=='Lost' else ''}}>Lost</option><option {{'selected' if kind=='Found' else ''}}>Found</option></select><select name="status"><option value="">All statuses</option>{% for s in ['open','available','released','resolved'] %}<option {{'selected' if status==s else ''}}>{{s}}</option>{% endfor %}</select><button class="button primary">Apply filters</button></form>
-<div class="panel table-panel"><table><thead><tr><th>REPORT</th><th>TYPE</th><th>DETAILS</th><th>LOCATION</th><th>DATE</th><th>STATUS</th><th>UPDATE</th></tr></thead><tbody>
-{% for r in records %}<tr><td><b>{{r.report_id}}</b></td><td>{{r.report_type}}</td><td><b>{{r.item_name}}</b><div class="sub">{{r.category}} · {{r.color}} · {{r.brand or 'Brand unknown'}}</div></td><td>{{r.location}}</td><td>{{r.report_date}}</td><td><span class="pill {{r.status}}">{{r.status}}</span></td><td><form class="inline-form" action="/records/{{r.report_id}}/status" method="post"><select name="status">{% for s in (['open','resolved'] if r.report_type=='Lost' else ['available','released']) %}<option value="{{s}}" {{'selected' if r.status==s else ''}}>{{s}}</option>{% endfor %}</select><button class="mini-button">Save</button></form></td></tr>{% else %}<tr><td colspan="7" class="empty">No records match those filters.</td></tr>{% endfor %}
-</tbody></table></div><p class="table-note">{{records|length}} record(s) shown. Updating a status creates an UndoStack entry.</p>{% endblock %}
+{% extends "base.html" %}
+{% block title %}All records{% endblock %}
+{% block heading %}All records{% endblock %}
+
+{% block content %}
+<div class="section-head">
+  <div>
+    <h3>Report directory</h3>
+    <p>
+      Records are arranged by report ID using the project's Quick Sort.
+    </p>
+  </div>
+  <a class="button outline" href="/export">Export CSV</a>
+</div>
+
+<form class="filterbar" method="get">
+  <input
+    name="q"
+    value="{{ q }}"
+    placeholder="Search ID, item, brand, location, or intake channel"
+  >
+  <select name="type">
+    <option value="">All types</option>
+    <option {{ 'selected' if kind == 'Lost' else '' }}>Lost</option>
+    <option {{ 'selected' if kind == 'Found' else '' }}>Found</option>
+  </select>
+  <select name="status">
+    <option value="">All statuses</option>
+    {% for option in ['open','available','released','resolved'] %}
+    <option {{ 'selected' if status == option else '' }}>{{ option }}</option>
+    {% endfor %}
+  </select>
+  <button class="button primary">Apply filters</button>
+</form>
+
+<div class="panel table-panel">
+  <table>
+    <thead>
+      <tr>
+        <th>REPORT</th>
+        <th>TYPE</th>
+        <th>DETAILS</th>
+        <th>OCCURRENCE</th>
+        <th>INTAKE / CUSTODY</th>
+        <th>STATUS</th>
+        <th>UPDATE</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for report in records %}
+      <tr>
+        <td><b>{{ report.report_id }}</b></td>
+        <td>{{ report.report_type }}</td>
+        <td>
+          <b>{{ report.item_name }}</b>
+          <div class="sub">
+            {{ report.category }} · {{ report.color }} ·
+            {{ report.brand or 'Brand unknown' }}
+          </div>
+        </td>
+        <td>
+          {{ report.location }}
+          <div class="sub">
+            {{ report.report_date }} · {{ report.report_time }}
+          </div>
+        </td>
+        <td>
+          {{ report.intake_channel }}
+          <div class="sub">
+            {{ report.custody_location or 'No physical custody' }}
+          </div>
+        </td>
+        <td>
+          <span class="pill {{ report.status }}">{{ report.status }}</span>
+        </td>
+        <td>
+          {% if report.report_type == 'Lost' %}
+          <form
+            class="inline-form"
+            action="/records/{{ report.report_id }}/status"
+            method="post"
+          >
+            <select name="status">
+              {% for option in ['open','resolved'] %}
+              <option
+                value="{{ option }}"
+                {{ 'selected' if report.status == option else '' }}
+              >
+                {{ option }}
+              </option>
+              {% endfor %}
+            </select>
+            <button class="mini-button">Save</button>
+          </form>
+          {% elif report.status == 'available' %}
+          <a class="mini-button" href="/matching">Verify through Matches</a>
+          {% else %}
+          <span class="sub">Completed through verified release</span>
+          {% endif %}
+        </td>
+      </tr>
+      {% else %}
+      <tr>
+        <td colspan="7" class="empty">
+          No records match those filters.
+        </td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+
+<p class="table-note">
+  {{ records|length }} record(s) shown. Lost-report status changes and
+  verified releases create an UndoStack entry.
+</p>
+{% endblock %}
