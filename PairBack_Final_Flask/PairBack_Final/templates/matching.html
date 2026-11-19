@@ -3,18 +3,6 @@
 {% block heading %}Matching{% endblock %}
 
 {% block content %}
-<div class="match-intro">
-  <div>
-    <span class="eyebrow">EXPLAINABLE COMPARISON</span>
-    <h2>Review possible <em>matches.</em></h2>
-    <p>
-      Choose an open lost report. PairBack scores each available found
-      item and uses Heap Sort to show the strongest candidates first.
-    </p>
-  </div>
-  <div class="match-symbol">LF</div>
-</div>
-
 <form class="match-picker panel" method="get">
   <label for="lost_id">Select an open lost-item report</label>
   <div class="picker-row">
@@ -117,20 +105,17 @@
 
 {% else %}
 <div class="panel empty-state">
-  <div class="empty-icon">LF</div>
   <h3>Select a report to begin</h3>
-  <p>
-    PairBack will show possible matches and explain every part of the score.
-  </p>
+  <p>Possible matches will appear here.</p>
 </div>
 {% endif %}
 
-<div class="note-box">
-  <b>Matching and release rules</b>
-  <span>
+<details class="rules-disclosure">
+  <summary>How matching works</summary>
+  <p>
     Category 30% · Color 25% · Brand 20% · Location 15% · Date 10%.
     The score is only a shortlist. DSWS staff must verify ownership using a valid ID or
     sufficient proof of ownership before releasing an item at MVP 101.
-  </span>
-</div>
+  </p>
+</details>
 {% endblock %}
