@@ -23,21 +23,23 @@ algorithms submitted in the earlier coding assignments.
 ### 1. Quick Sort
 
 The quick_sort function in data_structures.py arranges the record directory by
-report ID. It uses a middle pivot and separates values into lower, equal, and
-higher groups.
+report ID. It uses a middle pivot, an in-place three-way partition, and an
+explicit partition stack. Processing the smaller partition immediately keeps
+the stack bounded and avoids Python recursion-limit failures.
 
 - Average time: O(n log n)
 - Worst-case time: O(n^2)
-- Additional space: O(n) on balanced partitions; O(n^2) worst case for this recursive copying implementation
+- Additional space: O(n) for the returned copy plus O(log n) partition-stack
+  space when the smaller partition is processed first
 
 ### 2. Heap Sort
 
 The heap_sort function uses the student-built MaxHeap class to rank possible
-matches. Every candidate is inserted according to its match score. Repeated
-removal returns the highest-scoring candidate first. A smaller report ID wins
-when scores are equal.
+matches. It constructs the candidate heap bottom-up according to match score.
+Repeated removal returns the highest-scoring candidate first. A smaller report
+ID wins when scores are equal.
 
-- Build through repeated insertion: O(k log k)
+- Bottom-up heap construction: O(k)
 - Remove all ranked candidates: O(k log k)
 - Peek at strongest candidate: O(1)
 - Additional space: O(k)
@@ -96,14 +98,16 @@ Open http://127.0.0.1:5000 in a browser.
 
 ## Run the tests
 
-    py -m unittest -v
+    py -m unittest discover -p "*test*.py" -v
 
 The tests cover:
 
 - ArrayList growth and bounds
 - UndoStack LIFO behavior
 - Quick Sort ordering
+- Quick Sort empty, duplicate, and adversarial 1,100-item limits
 - Heap Sort ranking and tie-breaking
+- Heap Sort empty and 5,001-item input limits
 - Duplicate report prevention and JSON persistence
 - DSWS intake rules
 - Matching weights
@@ -111,21 +115,10 @@ The tests cover:
 - Released-item exclusion
 - Undo restoration
 
-## Files to replace
+## Validation record
 
-Replace these files in PairBack_Final_Flask/PairBack_Final/:
-
-- data_structures.py
-- pairback.py
-- app.py
-- tests.py
-- README.md
-- templates/new_report.html
-- templates/matching.html
-- templates/records.html
-
-The remaining files, including base.html, dashboard.html, search.html,
-style.css, requirements.txt, and the run scripts, can remain unchanged.
+`TEST_RESULTS.txt` records the current reproducible validation command and
+result.
 
 ## Prototype assumptions
 

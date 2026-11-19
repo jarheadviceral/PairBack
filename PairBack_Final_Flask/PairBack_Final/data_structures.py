@@ -69,30 +69,63 @@ class UndoStack:
 
 
 def quick_sort(items, key):
-    """Return a new list ordered with recursive three-way Quick Sort.
+    """Return a new list ordered with iterative three-way Quick Sort.
 
     The middle element is used as the pivot. Equal keys are kept together,
-    which avoids unnecessary recursive calls when many records share a key.
+    which avoids unnecessary partitions when many records share a key. An
+    explicit stack replaces Python recursion so an unfavorable pivot sequence
+    cannot fail at the interpreter's recursion limit.
     """
     values = list(items)
     if len(values) <= 1:
         return values
 
-    pivot_key = key(values[len(values) // 2])
-    lower = []
-    equal = []
-    higher = []
+    partitions = [(0, len(values) - 1)]
+    while partitions:
+        low, high = partitions.pop()
 
-    for value in values:
-        value_key = key(value)
-        if value_key < pivot_key:
-            lower.append(value)
-        elif value_key > pivot_key:
-            higher.append(value)
-        else:
-            equal.append(value)
+        # Continue with the smaller side and save the larger side. This keeps
+        # the explicit stack small even when partitions are unbalanced.
+        while low < high:
+            pivot_key = key(values[(low + high) // 2])
+            lower = low
+            current = low
+            higher = high
 
-    return quick_sort(lower, key) + equal + quick_sort(higher, key)
+            # Dutch-national-flag partition: [< pivot][= pivot][> pivot].
+            while current <= higher:
+                current_key = key(values[current])
+                if current_key < pivot_key:
+                    values[lower], values[current] = (
+                        values[current],
+                        values[lower],
+                    )
+                    lower += 1
+                    current += 1
+                elif current_key > pivot_key:
+                    values[current], values[higher] = (
+                        values[higher],
+                        values[current],
+                    )
+                    higher -= 1
+                else:
+                    current += 1
+
+            left = (low, lower - 1)
+            right = (higher + 1, high)
+            left_size = left[1] - left[0] + 1
+            right_size = right[1] - right[0] + 1
+
+            if left_size < right_size:
+                if right[0] < right[1]:
+                    partitions.append(right)
+                low, high = left
+            else:
+                if left[0] < left[1]:
+                    partitions.append(left)
+                low, high = right
+
+    return values
 
 
 class MaxHeap:
@@ -118,6 +151,12 @@ class MaxHeap:
     def push(self, value):
         self._items.append(value)
         self._sift_up(len(self._items) - 1)
+
+    def build(self, values):
+        """Build the heap bottom-up from an iterable in linear time."""
+        self._items = list(values)
+        for index in range(len(self._items) // 2 - 1, -1, -1):
+            self._sift_down(index)
 
     def pop(self):
         if self.is_empty():
@@ -171,12 +210,12 @@ class MaxHeap:
 def heap_sort(items, higher_priority):
     """Return items in priority order using a student-built Max Heap.
 
-    Inserting all values and repeatedly removing the heap root performs the
-    complete ranking without calling Python's built-in sorted function.
+    The heap is built bottom-up in O(n), then the highest-priority root is
+    repeatedly removed. This performs the complete ranking without calling
+    Python's built-in sorted function.
     """
     heap = MaxHeap(higher_priority)
-    for item in items:
-        heap.push(item)
+    heap.build(items)
 
     ordered = []
     while not heap.is_empty():

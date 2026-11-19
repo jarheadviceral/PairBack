@@ -79,6 +79,29 @@ class PairBackTests(unittest.TestCase):
         )
         self.assertEqual(records[0]["report_id"], "F003")
 
+    def test_quick_sort_handles_limits_and_adversarial_partitions(self):
+        self.assertEqual(quick_sort([], key=lambda value: value), [])
+        self.assertEqual(quick_sort([1], key=lambda value: value), [1])
+        self.assertEqual(
+            quick_sort([5, 3, 5, 1, 3], key=lambda value: value),
+            [1, 3, 3, 5, 5],
+        )
+
+        # Arrange values so the middle pivot is repeatedly the smallest
+        # remaining value. The former recursive implementation exceeded
+        # Python's recursion limit on this valid 1,100-item input.
+        count = 1100
+        positions = list(range(count))
+        adversarial = [None] * count
+        for value in range(count):
+            middle = len(positions) // 2
+            adversarial[positions.pop(middle)] = value
+
+        self.assertEqual(
+            quick_sort(adversarial, key=lambda value: value),
+            list(range(count)),
+        )
+
     def test_heap_sort_orders_score_then_smaller_id(self):
         def higher(first, second):
             if first["score"] != second["score"]:
@@ -94,6 +117,17 @@ class PairBackTests(unittest.TestCase):
         self.assertEqual(
             [candidate["id"] for candidate in ordered],
             ["F001", "F002", "F003"],
+        )
+
+    def test_heap_sort_handles_empty_and_large_inputs(self):
+        def higher(first, second):
+            return first > second
+
+        self.assertEqual(heap_sort([], higher), [])
+        values = list(range(5001))
+        self.assertEqual(
+            heap_sort(values, higher),
+            list(range(5000, -1, -1)),
         )
 
     def test_add_duplicate_validation_and_persistence(self):
