@@ -211,5 +211,65 @@ def health():
     return {"status": "ok", "records": len(store.records)}
 
 
+# Intake is local and staff-reviewed; this does not connect to Google accounts.
+from flask import session
+from intake import parse_csv, prepare_batch, commit_batch, IMPORT_FIELDS
+import secrets
+import time
+
+app.config["MAX_CONTENT_LENGTH"] = 2 * 1024 * 1024
+_pending_imports = {}
+
+@app.get("/dsws")
+def dsws():
+    return render_template("dsws.html")
+
+@app.route("/intake", methods=["GET", "POST"])
+def intake():
+    preview = None
+    skipped = 0
+    token = None
+    for key, pending in list(_pending_imports.items()):
+        if time.time() - pending[0] > 1800:
+            _pending_imports.pop(key, None)
+    if request.method == "POST":
+        try:
+            if request.form.get("action") == "commit":
+                token = request.form.get("token", "")
+                if not token or token != session.get("import_token") or token not in _pending_imports:
+                    raise ValueError("Preview expired. Upload the CSV again.")
+                _, rows = _pending_imports[token]
+                count, skipped = commit_batch(store, rows)
+                _pending_imports.pop(token)
+                session.pop("import_token", None)
+                flash(f"Imported {count} reports; skipped {skipped} exact duplicates.", "success")
+                return redirect(url_for("records"))
+            upload = request.files.get("file")
+            if not upload or not upload.filename.lower().endswith(".csv"):
+                raise ValueError("Choose a UTF-8 CSV file.")
+            rows = parse_csv(upload.read().decode("utf-8-sig"))
+            preview, skipped = prepare_batch(store, rows)
+            old_token = session.get("import_token")
+            _pending_imports.pop(old_token, None)
+            token = secrets.token_urlsafe(24)
+            session["import_token"] = token
+            _pending_imports[token] = (time.time(), rows)
+        except (ValueError, UnicodeError, csv.Error) as error:
+            flash(str(error), "error")
+    return render_template("intake.html", preview=preview, skipped=skipped, token=token)
+
+@app.get("/intake/template")
+def intake_template():
+    output = io.StringIO()
+    writer = csv.DictWriter(output, fieldnames=IMPORT_FIELDS)
+    writer.writeheader()
+    writer.writerow(dict(item_name="Blue bottle",category="Bottle",color="Blue",brand="",location="Library",report_date="2026-11-19",report_time="14:30",description="Synthetic example: remove before importing"))
+    return send_file(io.BytesIO(output.getvalue().encode("utf-8-sig")),mimetype="text/csv",as_attachment=True,download_name="pairback_intake_template.csv")
+
+@app.errorhandler(413)
+def upload_too_large(error):
+    return "CSV exceeds the 2 MB upload limit. Return to Intake and choose a smaller file.", 413
+
+
 if __name__ == "__main__":
     app.run(debug=True)

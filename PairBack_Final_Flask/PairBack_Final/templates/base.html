@@ -1,20 +1,15 @@
 <!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
 <title>{% block title %}PairBack{% endblock %} · PairBack</title>
 <link rel="stylesheet" href="{{ url_for('static',filename='style.css') }}"></head><body>
-<aside class="sidebar">
- <a class="brand" href="/"><span class="brand-mark">P</span><span>pairback<small>CAMPUS LOST & FOUND</small></span></a>
- <div class="nav-label">WORKSPACE</div>
- <nav>
-  <a href="/" class="{{ 'active' if request.path=='/' else '' }}">▦ <span>Dashboard</span></a>
-  <a href="/records" class="{{ 'active' if request.path.startswith('/records') else '' }}">▤ <span>All records</span></a>
-  <a href="/reports/new" class="{{ 'active' if request.path=='/reports/new' else '' }}">＋ <span>Add a report</span></a>
-  <a href="/matching" class="{{ 'active' if request.path=='/matching' else '' }}">⌕ <span>Smart matching</span></a>
-  <a href="/search" class="{{ 'active' if request.path=='/search' else '' }}">⌕ <span>Find by ID</span></a>
+<header class="site-nav">
+ <a class="brand" href="/"><img src="{{ url_for('static',filename='pairback-logo.png') }}" alt="" width="40" height="40"><span>pairback<small>CAMPUS LOST &amp; FOUND</small></span></a>
+ <nav aria-label="Main navigation">
+ {% for path,label in [('/', 'Dashboard'),('/records','Records'),('/intake','Intake'),('/matching','Matches'),('/dsws','About DSWS')] %}
+ <a href="{{path}}" {% if request.path == path %}aria-current="page"{% endif %}>{{label}}</a>
+ {% endfor %}
+ <details class="tools-menu"><summary>Tools</summary><div><a href="/search">Find by ID</a><a href="/export">Export CSV</a><form action="/undo" method="post"><button class="undo-link">Undo latest change ({{undo_count}})</button></form></div></details>
  </nav>
- <div class="sidebar-bottom"><div class="nav-label">TOOLS</div><a href="/export">⇩ <span>Export CSV</span></a>
- <form action="/undo" method="post"><button class="undo-link" type="submit">↶ <span>Undo latest change</span><b>{{ undo_count }}</b></button></form>
- <div class="desk-user"><div class="avatar">LF</div><div><b>Lost & Found Desk</b><small>Local workspace</small></div></div></div>
-</aside>
+</header>
 <main class="main"><header class="topbar"><div><span class="eyebrow">CAMPUS OPERATIONS</span><h1>{% block heading %}Dashboard{% endblock %}</h1></div><a class="button primary" href="/reports/new">＋ New report</a></header>
 {% with messages=get_flashed_messages(with_categories=true) %}{% if messages %}<div class="alerts">{% for category,message in messages %}<div class="alert {{category}}">{{message}}</div>{% endfor %}</div>{% endif %}{% endwith %}
 {% block content %}{% endblock %}
