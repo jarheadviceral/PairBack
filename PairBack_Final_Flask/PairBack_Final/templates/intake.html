@@ -1,6 +1,115 @@
-{% extends "base.html" %}{% block heading %}Add reports{% endblock %}{% block title %}Add reports{% endblock %}{% block content %}
-<div class="intake-steps" aria-label="Import steps"><div><b>1</b><span>Export responses</span></div><div><b>2</b><span>Upload the CSV</span></div><div><b>3</b><span>Review and save</span></div></div>
-<div class="info-grid intake-grid"><section class="panel info-card action-card"><div class="action-card-head"><span class="action-icon">CSV</span><div><span class="eyebrow">GOOGLE FORM RESPONSES</span><h2>Upload a batch</h2></div></div><p>Export the linked response Sheet as CSV, then upload it here.</p><div class="action-links"><a class="resource-link" href="/intake/template"><b>CSV template</b><span>Download the required columns</span></a><a class="resource-link" href="https://bit.ly/MissingItemForm" target="_blank" rel="noopener"><b>Missing Item Form</b><span>Open the student form</span></a></div><form class="intake-form" method="post" enctype="multipart/form-data"><label>Choose a CSV file<input type="file" name="file" accept=".csv,text/csv" required></label><button class="button primary">Preview import</button></form><details class="helper-details"><summary>CSV requirements</summary><p>Use YYYY-MM-DD dates and HH:MM times. Files may contain up to 500 rows and must be under 2 MB. Invalid rows stop the import; exact duplicates are skipped.</p><p>Use the time the item was lost, not the form submission time. Staff need access to the form's response Sheet.</p></details></section>
-<section class="panel info-card action-card"><div class="action-card-head"><span class="action-icon mail-icon">@</span><div><span class="eyebrow">EMAILS &amp; WALK-INS</span><h2>Add one report</h2></div></div><p>Choose the source and enter only the item details needed by staff.</p><div class="stacked-actions"><a class="button email-button" href="/reports/new?channel=email">Record an email</a><a class="button outline" href="/reports/new">Record a walk-in</a></div><div class="compact-note"><b>Student email</b><span>dswslostandfound@gmail.com</span></div><details class="helper-details"><summary>Privacy reminder</summary><p>PairBack does not read or reply to email. Do not copy student contact details or ID images into this classroom demo.</p></details></section></div>
-{% if preview is not none %}<div class="section-head"><div><h3>Review before importing</h3><p>{{preview|length}} new reports · {{skipped}} exact duplicates skipped. Preview expires after 30 minutes or a server restart.</p></div></div><div class="panel table-panel"><table class="import-table"><thead><tr><th>Item</th><th>Category</th><th>Color</th><th>Location</th><th>Date / time lost</th></tr></thead><tbody>{% for r in preview %}<tr><td>{{r.item_name}}</td><td>{{r.category}}</td><td>{{r.color}}</td><td>{{r.location}}</td><td>{{r.report_date}} {{r.report_time}}</td></tr>{% endfor %}</tbody></table></div><form method="post" class="form-actions"><input type="hidden" name="action" value="commit"><input type="hidden" name="token" value="{{token}}"><a href="/intake">Cancel</a><button class="button primary">Confirm import</button></form>{% endif %}
+{% extends "base.html" %}
+{% block heading %}Add reports{% endblock %}
+{% block title %}Add reports{% endblock %}
+{% block content %}
+  <div class="intake-steps" aria-label="Import steps">
+    <div>
+      <b>1</b>
+      <span>Export responses</span>
+    </div>
+    <div>
+      <b>2</b>
+      <span>Upload the CSV</span>
+    </div>
+    <div>
+      <b>3</b>
+      <span>Review and save</span>
+    </div>
+  </div>
+  <div class="info-grid intake-grid">
+    <section class="panel info-card action-card">
+      <div class="action-card-head">
+        <span class="action-icon">CSV</span>
+        <div>
+          <span class="eyebrow">GOOGLE FORM RESPONSES</span>
+          <h2>Upload a batch</h2>
+        </div>
+      </div>
+      <p>Export the linked response Sheet as CSV, then upload it here.</p>
+      <div class="action-links">
+        <a class="resource-link" href="/intake/template">
+          <b>CSV template</b>
+          <span>Download the required columns</span>
+        </a>
+        <a class="resource-link"
+           href="https://bit.ly/MissingItemForm"
+           target="_blank"
+           rel="noopener">
+          <b>Missing Item Form</b>
+          <span>Open the student form</span>
+        </a>
+      </div>
+      <form class="intake-form" method="post" enctype="multipart/form-data">
+        <label>
+          Choose a CSV file<input type="file" name="file" accept=".csv,text/csv" required>
+        </label>
+        <button class="button primary">Preview import</button>
+      </form>
+      <details class="helper-details">
+        <summary>CSV requirements</summary>
+        <p>Use YYYY-MM-DD dates and HH:MM times. Files may contain up to 500 rows and must be under 2 MB. Invalid rows stop the import; exact duplicates are skipped.</p>
+        <p>Use the time the item was lost, not the form submission time. Staff need access to the form's response Sheet.</p>
+      </details>
+    </section>
+    <section class="panel info-card action-card">
+      <div class="action-card-head">
+        <span class="action-icon mail-icon">@</span>
+        <div>
+          <span class="eyebrow">EMAILS &amp; WALK-INS</span>
+          <h2>Add one report</h2>
+        </div>
+      </div>
+      <p>Choose the source and enter only the item details needed by staff.</p>
+      <div class="stacked-actions">
+        <a class="button email-button" href="/reports/new?channel=email">Record an email</a>
+        <a class="button outline" href="/reports/new">Record a walk-in</a>
+      </div>
+      <div class="compact-note">
+        <b>Student email</b>
+        <span>dswslostandfound@gmail.com</span>
+      </div>
+      <details class="helper-details">
+        <summary>Privacy reminder</summary>
+        <p>PairBack does not read or reply to email. Do not copy student contact details or ID images into this classroom demo.</p>
+      </details>
+    </section>
+  </div>
+  {% if preview is not none %}
+    <div class="section-head">
+      <div>
+        <h3>Review before importing</h3>
+        <p>{{ preview|length }} new reports · {{ skipped }} exact duplicates skipped. Preview expires after 30 minutes or a server restart.</p>
+      </div>
+    </div>
+    <div class="panel table-panel">
+      <table class="import-table">
+        <thead>
+          <tr>
+            <th>Item</th>
+            <th>Category</th>
+            <th>Color</th>
+            <th>Location</th>
+            <th>Date / time lost</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for r in preview %}
+            <tr>
+              <td>{{ r.item_name }}</td>
+              <td>{{ r.category }}</td>
+              <td>{{ r.color }}</td>
+              <td>{{ r.location }}</td>
+              <td>{{ r.report_date }} {{ r.report_time }}</td>
+            </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+    <form method="post" class="form-actions">
+      <input type="hidden" name="action" value="commit">
+      <input type="hidden" name="token" value="{{ token }}">
+      <a href="/intake">Cancel</a>
+      <button class="button primary">Confirm import</button>
+    </form>
+  {% endif %}
 {% endblock %}

@@ -1,6 +1,6 @@
 # PairBack UI and intake update — 20 November 2026
 
-Built on `origin/pairback-algorithms-dsws` (33c7459), which is separate from main. Flask, Quick Sort, Heap Sort, ArrayList, and UndoStack remain in place.
+Built on `origin/pairback-algorithms-dsws` (33c7459), which is separate from main. Flask, Quick Sort, Insertion Sort, ArrayList, and UndoStack remain in place.
 
 ## Changes
 

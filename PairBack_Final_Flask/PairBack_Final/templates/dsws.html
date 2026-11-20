@@ -1,7 +1,90 @@
-{% extends "base.html" %}{% block heading %}About DSWS{% endblock %}{% block title %}About DSWS{% endblock %}{% block content %}
-<section class="dsws-hero panel"><div class="dsws-heading"><span class="eyebrow">LOST &amp; FOUND AT MVP 101</span><h2>Department of Student<br>Welfare and Services</h2><p>Ateneo de Manila University · Loyola Heights</p></div><div class="dsws-mark"><img src="{{ url_for('static',filename='dsws-logo.png') }}" alt="DSWS logo"></div></section>
-<section class="office-directory" aria-label="Office location and hours"><div class="office-address"><span class="eyebrow">COME BY THE OFFICE</span><h3>MVP 101</h3><p>Manuel V. Pangilinan Center</p></div><div class="office-hours"><h3>Office hours</h3><dl><div><dt>Monday, Tuesday, Thursday &amp; Friday</dt><dd>9:30 AM – 5:00 PM</dd></div><div><dt>Wednesday</dt><dd>9:30 AM – 2:00 PM</dd></div></dl></div></section>
-<div class="section-head"><h3>Report or claim an item</h3></div>
-<div class="claim-steps"><div class="panel"><b>1</b><span>Check the last known location and ask the area's security guard.</span></div><div class="panel"><b>2</b><span>Send the item description, date, and approximate time lost.</span></div><div class="panel"><b>3</b><span>Bring a valid ID or proof of ownership when claiming.</span></div></div>
-<div class="contact-grid"><a class="panel contact-card" href="https://bit.ly/MissingItemForm" target="_blank" rel="noopener"><span class="contact-icon">FORM</span><div><b>Missing Item Form</b><small>Submit a report online</small></div></a><a class="panel contact-card" href="mailto:dswslostandfound@gmail.com"><span class="contact-icon">@</span><div><b>Email DSWS</b><small>dswslostandfound@gmail.com</small></div></a><a class="panel contact-card" href="https://www.facebook.com/AteneoDSWS/" target="_blank" rel="noopener"><span class="contact-icon">f</span><div><b>DSWS updates</b><small>View announcements</small></div></a></div>
+{% extends "base.html" %}
+{% block heading %}About DSWS{% endblock %}
+{% block title %}About DSWS{% endblock %}
+{% block content %}
+  <section class="dsws-hero panel">
+    <div class="dsws-heading">
+      <span class="eyebrow">LOST &amp; FOUND AT MVP 101</span>
+      <h2>
+        Department of Student
+        <br>
+        Welfare and Services
+      </h2>
+      <p>Ateneo de Manila University · Loyola Heights</p>
+    </div>
+    <div class="dsws-mark">
+      <img src="{{ url_for('static',filename='dsws-logo.png') }}"
+           alt="DSWS logo">
+    </div>
+  </section>
+  <section class="office-directory" aria-label="Office location and hours">
+    <div class="office-address">
+      <span class="eyebrow">COME BY THE OFFICE</span>
+      <h3>MVP 101</h3>
+      <p>Manuel V. Pangilinan Center</p>
+    </div>
+    <div class="office-hours">
+      <h3>Office hours</h3>
+      <dl>
+        <div>
+          <dt>Monday, Tuesday, Thursday &amp; Friday</dt>
+          <dd>
+            9:30 AM – 5:00 PM
+          </dd>
+        </div>
+        <div>
+          <dt>Wednesday</dt>
+          <dd>
+            9:30 AM – 2:00 PM
+          </dd>
+        </div>
+      </dl>
+    </div>
+  </section>
+  <div class="section-head">
+    <h3>Report or claim an item</h3>
+  </div>
+  <div class="claim-steps">
+    <div class="panel">
+      <b>1</b>
+      <span>Check the last known location and ask the area's security guard.</span>
+    </div>
+    <div class="panel">
+      <b>2</b>
+      <span>Send the item description, date, and approximate time lost.</span>
+    </div>
+    <div class="panel">
+      <b>3</b>
+      <span>Bring a valid ID or proof of ownership when claiming.</span>
+    </div>
+  </div>
+  <div class="contact-grid">
+    <a class="panel contact-card"
+       href="https://bit.ly/MissingItemForm"
+       target="_blank"
+       rel="noopener">
+      <span class="contact-icon">FORM</span>
+      <div>
+        <b>Missing Item Form</b>
+        <small>Submit a report online</small>
+      </div>
+    </a>
+    <a class="panel contact-card" href="mailto:dswslostandfound@gmail.com">
+      <span class="contact-icon">@</span>
+      <div>
+        <b>Email DSWS</b>
+        <small>dswslostandfound@gmail.com</small>
+      </div>
+    </a>
+    <a class="panel contact-card"
+       href="https://www.facebook.com/AteneoDSWS/"
+       target="_blank"
+       rel="noopener">
+      <span class="contact-icon">f</span>
+      <div>
+        <b>DSWS updates</b>
+        <small>View announcements</small>
+      </div>
+    </a>
+  </div>
 {% endblock %}

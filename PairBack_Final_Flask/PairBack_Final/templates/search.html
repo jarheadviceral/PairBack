@@ -1,3 +1,35 @@
-{% extends "base.html" %}{% block title %}Find by ID{% endblock %}{% block heading %}Find by ID{% endblock %}
-{% block content %}<div class="search-wrap"><h2>Look up a record</h2><p>Enter the exact report ID.</p><form class="search-form" method="get"><input name="id" value="{{query}}" placeholder="Enter report ID, e.g. F001" required><button class="button primary">Search ID</button></form>
-{% if searched %}{% if result %}<div class="panel result-card"><span class="pill {{result.status}}">FOUND</span><h3>{{result.item_name}}</h3><p>{{result.report_id}} · {{result.report_type}}</p><div class="result-grid">{% for label,key in [('Category','category'),('Color','color'),('Brand','brand'),('Location','location'),('Date','report_date'),('Status','status')] %}<div><small>{{label}}</small><b>{{result[key] or 'Not provided'}}</b></div>{% endfor %}</div></div>{% else %}<div class="alert error">No report found with ID “{{query}}”.</div>{% endif %}{% endif %}</div>{% endblock %}
+{% extends "base.html" %}
+{% block title %}Find by ID{% endblock %}
+{% block heading %}Find by ID{% endblock %}
+{% block content %}
+  <div class="search-wrap">
+    <h2>Look up a record</h2>
+    <p>Enter the exact report ID.</p>
+    <form class="search-form" method="get">
+      <input name="id"
+             value="{{ query }}"
+             placeholder="Enter report ID, e.g. F001"
+             required>
+      <button class="button primary">Search ID</button>
+    </form>
+    {% if searched %}
+      {% if result %}
+        <div class="panel result-card">
+          <span class="pill {{ result.status }}">FOUND</span>
+          <h3>{{ result.item_name }}</h3>
+          <p>{{ result.report_id }} · {{ result.report_type }}</p>
+          <div class="result-grid">
+            {% for label,key in [('Category','category'),('Color','color'),('Brand','brand'),('Location','location'),('Date','report_date'),('Status','status')] %}
+              <div>
+                <small>{{ label }}</small>
+                <b>{{ result[key] or 'Not provided' }}</b>
+              </div>
+            {% endfor %}
+          </div>
+        </div>
+      {% else %}
+        <div class="alert error">No report found with ID “{{ query }}”.</div>
+      {% endif %}
+    {% endif %}
+  </div>
+{% endblock %}

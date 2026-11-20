@@ -1,121 +1,100 @@
 {% extends "base.html" %}
 {% block title %}Matching{% endblock %}
 {% block heading %}Matching{% endblock %}
-
 {% block content %}
-<form class="match-picker panel" method="get">
-  <label for="lost_id">Select an open lost-item report</label>
-  <div class="picker-row">
-    <select id="lost_id" name="lost_id" required>
-      <option value="">Choose a lost report</option>
-      {% for report in lost %}
-      <option
-        value="{{ report.report_id }}"
-        {{ 'selected' if selected == report.report_id else '' }}
-      >
-        {{ report.report_id }} · {{ report.item_name }}
-      </option>
-      {% endfor %}
-    </select>
-    <button class="button primary">Find possible matches</button>
-  </div>
-</form>
-
-{% if selected %}
-<div class="section-head">
-  <div>
-    <h3>Ranked candidates</h3>
-    <p>
-      Ranked with a Max Heap by highest score, with report ID used
-      to break ties.
-    </p>
-  </div>
-  <span class="pill available">{{ results|length }} candidates</span>
-</div>
-
-{% for item in results %}
-<div class="panel candidate">
-  <div class="candidate-top">
-    <div>
-      <span class="eyebrow">FOUND REPORT · {{ item.record.report_id }}</span>
-      <h3>{{ item.record.item_name }}</h3>
-      <p>{{ item.record.description or 'No additional description.' }}</p>
+  <form class="match-picker panel" method="get">
+    <label for="lost_id">Select an open lost-item report</label>
+    <div class="picker-row">
+      <select id="lost_id" name="lost_id" required>
+        <option value="">Choose a lost report</option>
+        {% for report in lost %}
+          <option value="{{ report.report_id }}"
+                  {{ 'selected' if selected == report.report_id else '' }}>
+            {{ report.report_id }} · {{ report.item_name }}
+          </option>
+        {% endfor %}
+      </select>
+      <button class="button primary">Find possible matches</button>
     </div>
-    <div class="score">
-      <strong>{{ item.score }}%</strong>
-      <small>match score</small>
+  </form>
+  {% if selected %}
+    <div class="section-head">
+      <div>
+        <h3>Ranked candidates</h3>
+        <p>
+          Ranked by highest score, with report ID used
+          to break ties.
+        </p>
+      </div>
+      <span class="pill available">{{ results|length }} candidates</span>
     </div>
-  </div>
-
-  <div class="score-track">
-    <span style="width:{{ item.score }}%"></span>
-  </div>
-
-  <div class="reason-grid">
-    {% for reason in item.reasons %}
-    <div class="reason {{ 'matched' if reason.matched else '' }}">
-      <span>
-        {{ '✓' if reason.matched else '–' }}
-        {{ reason.field }}
-        <small>+{{ reason.weight }}%</small>
-      </span>
-      <b>{{ reason.lost }} <i>vs</i> {{ reason.found }}</b>
-    </div>
+    {% for item in results %}
+      <div class="panel candidate">
+        <div class="candidate-top">
+          <div>
+            <span class="eyebrow">FOUND REPORT · {{ item.record.report_id }}</span>
+            <h3>{{ item.record.item_name }}</h3>
+            <p>{{ item.record.description or 'No additional description.' }}</p>
+          </div>
+          <div class="score">
+            <strong>{{ item.score }}%</strong>
+            <small>match score</small>
+          </div>
+        </div>
+        <div class="score-track">
+          <span style="width:{{ item.score }}%"></span>
+        </div>
+        <div class="reason-grid">
+          {% for reason in item.reasons %}
+            <div class="reason {{ 'matched' if reason.matched else '' }}">
+              <span>
+                {{ '✓' if reason.matched else '–' }}
+                {{ reason.field }}
+                <small>+{{ reason.weight }}%</small>
+              </span>
+              <b>{{ reason.lost }} <i>vs</i> {{ reason.found }}</b>
+            </div>
+          {% endfor %}
+        </div>
+        <div class="candidate-foot">
+          <span>
+            Found at {{ item.record.location }} · {{ item.record.report_date }}
+            {{ item.record.report_time }} · Item held at: {{ item.record.custody_location }}
+          </span>
+          <form action="/records/{{ item.record.report_id }}/release"
+                method="post"
+                class="release-check">
+            <input type="hidden" name="release_location" value="MVP 101">
+            <label>
+              <input type="checkbox" name="valid_id" value="yes">
+              Valid ID checked
+            </label>
+            <label>
+              <input type="checkbox" name="proof_of_ownership" value="yes">
+              Ownership verified
+            </label>
+            <button class="mini-button"
+                    onclick="return confirm('Confirm that the item is physically ready for release at MVP 101.')">
+              Release at MVP 101
+            </button>
+          </form>
+        </div>
+      </div>
+    {% else %}
+      <div class="panel empty-state">No available found reports to compare.</div>
     {% endfor %}
-  </div>
-
-  <div class="candidate-foot">
-    <span>
-      Found at {{ item.record.location }} · {{ item.record.report_date }}
-      {{ item.record.report_time }} · Item held at: {{ item.record.custody_location }}
-    </span>
-
-    <form
-      action="/records/{{ item.record.report_id }}/release"
-      method="post"
-      class="release-check"
-    >
-      <input type="hidden" name="release_location" value="MVP 101">
-      <label>
-        <input type="checkbox" name="valid_id" value="yes">
-        Valid ID checked
-      </label>
-      <label>
-        <input
-          type="checkbox"
-          name="proof_of_ownership"
-          value="yes"
-        >
-        Ownership verified
-      </label>
-      <button
-        class="mini-button"
-        onclick="return confirm('Confirm that the item is physically ready for release at MVP 101.')"
-      >
-        Release at MVP 101
-      </button>
-    </form>
-  </div>
-</div>
-{% else %}
-<div class="panel empty-state">
-  No available found reports to compare.
-</div>
-{% endfor %}
-
-{% else %}
-<div class="panel empty-state">
-  <h3>Select a report to begin</h3>
-  <p>Possible matches will appear here.</p>
-</div>
-{% endif %}
-
-<details class="rules-disclosure">
-  <summary>How matching works</summary>
-  <p>
-    Category 30% · Color 25% · Brand 20% · Location 15% · Date 10%.
-    The score is only a shortlist. DSWS staff must verify ownership using a valid ID or
-    sufficient proof of ownership before releasing an item at MVP 101.
-  </p>
-</details>
+  {% else %}
+    <div class="panel empty-state">
+      <h3>Select a report to begin</h3>
+      <p>Possible matches will appear here.</p>
+    </div>
+  {% endif %}
+  <details class="rules-disclosure">
+    <summary>How matching works</summary>
+    <p>
+      Category 30% · Color 25% · Brand 20% · Location 15% · Date 10%.
+      The score is only a shortlist. DSWS staff must verify ownership using a valid ID or
+      sufficient proof of ownership before releasing an item at MVP 101.
+    </p>
+  </details>
 {% endblock %}

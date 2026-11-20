@@ -5,7 +5,7 @@ Command:
 python -m unittest discover -p "*test*.py" -v
 
 Result:
-15 tests passed.
+21 tests passed.
 
 Coverage:
 - CSV validation, duplicate skipping, atomic rejection, preview, and confirmation
@@ -14,8 +14,8 @@ Coverage:
 - UndoStack LIFO behavior
 - Quick Sort ordering and input preservation
 - Quick Sort empty, duplicate, and adversarial 1,100-item input
-- Heap Sort ranking and deterministic tie-breaking
-- Heap Sort empty and 5,001-item input
+- Insertion Sort ranking and deterministic tie-breaking
+- Insertion Sort empty and 5,001-item input
 - Record validation, duplicate IDs, and JSON persistence
 - DSWS intake and custody rules
 - Matching weights and candidate order
@@ -24,8 +24,8 @@ Coverage:
 
 Additional checks:
 - Python bytecode compilation passed.
-- Randomized 10,000-item Quick Sort and Heap Sort comparisons matched Python's
-  reference ordering.
+- Insertion Sort: randomized reference comparisons, a 5,001-item reverse-order
+  case, stable ties, and linear comparisons on already ordered input.
 
 Known prototype boundary:
 JSON persistence rewrites the complete record collection after a mutation. It

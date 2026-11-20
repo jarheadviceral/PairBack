@@ -128,96 +128,18 @@ def quick_sort(items, key):
     return values
 
 
-class MaxHeap:
-    """Max heap used as a priority queue for match candidates.
+def insertion_sort(items, higher_priority):
+    """Stable priority ordering without changing the caller's collection.
 
-    The supplied higher_priority function returns True when its first
-    argument should appear before its second argument.
+    Best case O(k), average/worst case O(k^2). The returned copy uses O(k)
+    space; the insertion loop itself uses O(1) auxiliary space.
     """
-
-    def __init__(self, higher_priority):
-        self._items = []
-        self._higher_priority = higher_priority
-
-    def __len__(self):
-        return len(self._items)
-
-    def is_empty(self):
-        return len(self._items) == 0
-
-    def peek(self):
-        return None if self.is_empty() else self._items[0]
-
-    def push(self, value):
-        self._items.append(value)
-        self._sift_up(len(self._items) - 1)
-
-    def build(self, values):
-        """Build the heap bottom-up from an iterable in linear time."""
-        self._items = list(values)
-        for index in range(len(self._items) // 2 - 1, -1, -1):
-            self._sift_down(index)
-
-    def pop(self):
-        if self.is_empty():
-            return None
-
-        highest = self._items[0]
-        last = self._items.pop()
-        if self._items:
-            self._items[0] = last
-            self._sift_down(0)
-        return highest
-
-    def _sift_up(self, index):
-        while index > 0:
-            parent = (index - 1) // 2
-            if not self._higher_priority(self._items[index], self._items[parent]):
-                break
-            self._items[index], self._items[parent] = (
-                self._items[parent],
-                self._items[index],
-            )
-            index = parent
-
-    def _sift_down(self, index):
-        size = len(self._items)
-        while True:
-            left = 2 * index + 1
-            right = left + 1
-            best = index
-
-            if (
-                left < size
-                and self._higher_priority(self._items[left], self._items[best])
-            ):
-                best = left
-            if (
-                right < size
-                and self._higher_priority(self._items[right], self._items[best])
-            ):
-                best = right
-            if best == index:
-                return
-
-            self._items[index], self._items[best] = (
-                self._items[best],
-                self._items[index],
-            )
-            index = best
-
-
-def heap_sort(items, higher_priority):
-    """Return items in priority order using a student-built Max Heap.
-
-    The heap is built bottom-up in O(n), then the highest-priority root is
-    repeatedly removed. This performs the complete ranking without calling
-    Python's built-in sorted function.
-    """
-    heap = MaxHeap(higher_priority)
-    heap.build(items)
-
-    ordered = []
-    while not heap.is_empty():
-        ordered.append(heap.pop())
+    ordered = list(items)
+    for index in range(1, len(ordered)):
+        current = ordered[index]
+        position = index - 1
+        while position >= 0 and higher_priority(current, ordered[position]):
+            ordered[position + 1] = ordered[position]
+            position -= 1
+        ordered[position + 1] = current
     return ordered
