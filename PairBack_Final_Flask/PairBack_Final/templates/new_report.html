@@ -44,12 +44,12 @@
 
     <div class="form-grid">
       <label>
-        Item name <span>*</span>
+        <span class="field-label">Item name <span>*</span></span>
         <input name="item_name" required placeholder="e.g. Blue water bottle">
       </label>
 
       <label>
-        Category <span>*</span>
+        <span class="field-label">Category <span>*</span></span>
         <select name="category" required>
           <option value="">Choose category</option>
           {% for category in ['Bottle','Electronics','Bag','Clothing','Umbrella','Notebook','Keys','Wallet','Accessories','Other'] %}
@@ -59,7 +59,7 @@
       </label>
 
       <label>
-        Color <span>*</span>
+        <span class="field-label">Color <span>*</span></span>
         <input name="color" required placeholder="e.g. Navy blue">
       </label>
 
@@ -69,7 +69,7 @@
       </label>
 
       <label>
-        Building / campus location <span>*</span>
+        <span class="field-label">Building / campus location <span>*</span></span>
         <select name="building" id="building" required>
           <option value="">Choose a location</option>
           {% for building in campus_locations %}<option>{{ building }}</option>{% endfor %}
@@ -84,19 +84,19 @@
       </label>
 
       <label>
-        Date lost or found <span>*</span>
+        <span class="field-label">Date lost or found <span>*</span></span>
         <input type="date" name="report_date" required>
       </label>
 
       <label>
-        Approximate time <span>*</span>
+        <span class="field-label">Approximate time <span>*</span></span>
         <input type="time" name="report_time" required>
       </label>
 
       <label>
-        Intake channel <span>*</span>
+        <span class="field-label">Report source <span>*</span></span>
         <select name="intake_channel" id="intake_channel" required>
-          <option value="">Choose intake channel</option>
+          <option value="">Choose report source</option>
           <option data-type="Lost Found">In Person - MVP 101</option>
           <option data-type="Lost">Online Lost Items Report Form</option>
           <option data-type="Lost">Email</option>
@@ -105,9 +105,9 @@
       </label>
 
       <label id="custody_group" hidden>
-        Current custody location <span>*</span>
+        <span class="field-label">Item currently held at <span>*</span></span>
         <select name="custody_location" id="custody_location">
-          <option value="">Choose custody location</option>
+          <option value="">Choose holding location</option>
           <option>MVP 101</option>
           <option>OADSA - Xavier Hall</option>
         </select>
