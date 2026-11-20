@@ -176,7 +176,9 @@ class PairBack:
                     self.data_file.read_text(encoding="utf-8")
                 )
             except (json.JSONDecodeError, OSError) as error:
-                raise ValueError("Cannot read existing records; restore or repair the data file.") from error
+                raise ValueError(
+                    "Cannot read existing records; restore or repair the data file."
+                ) from error
         else:
             raw_records = SAMPLE_RECORDS if seed else []
 

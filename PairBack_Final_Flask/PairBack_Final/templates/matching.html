@@ -59,7 +59,8 @@
         <div class="candidate-foot">
           <span>
             Found at {{ item.record.location }} · {{ item.record.report_date }}
-            {{ item.record.report_time }} · Item held at: {{ item.record.custody_location }}
+            {{ item.record.report_time }} · Item held at:
+            {{ item.record.custody_location }}
           </span>
           <form action="/records/{{ item.record.report_id }}/release"
                 method="post"
@@ -74,7 +75,9 @@
               Ownership verified
             </label>
             <button class="mini-button"
-                    onclick="return confirm('Confirm that the item is physically ready for release at MVP 101.')">
+                    onclick="return confirm(
+                      'Confirm that the item is physically ready for release at MVP 101.'
+                    )">
               Release at MVP 101
             </button>
           </form>
@@ -93,8 +96,9 @@
     <summary>How matching works</summary>
     <p>
       Category 30% · Color 25% · Brand 20% · Location 15% · Date 10%.
-      The score is only a shortlist. DSWS staff must verify ownership using a valid ID or
-      sufficient proof of ownership before releasing an item at MVP 101.
+      The score is only a shortlist. DSWS staff must verify ownership using
+      a valid ID or sufficient proof of ownership before releasing an item
+      at MVP 101.
     </p>
   </details>
 {% endblock %}

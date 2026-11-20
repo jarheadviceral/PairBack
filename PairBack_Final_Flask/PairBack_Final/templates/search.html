@@ -19,7 +19,15 @@
           <h3>{{ result.item_name }}</h3>
           <p>{{ result.report_id }} · {{ result.report_type }}</p>
           <div class="result-grid">
-            {% for label,key in [('Category','category'),('Color','color'),('Brand','brand'),('Location','location'),('Date','report_date'),('Status','status')] %}
+            {% set result_fields = [
+              ('Category', 'category'),
+              ('Color', 'color'),
+              ('Brand', 'brand'),
+              ('Location', 'location'),
+              ('Date', 'report_date'),
+              ('Status', 'status')
+            ] %}
+            {% for label,key in result_fields %}
               <div>
                 <small>{{ label }}</small>
                 <b>{{ result[key] or 'Not provided' }}</b>

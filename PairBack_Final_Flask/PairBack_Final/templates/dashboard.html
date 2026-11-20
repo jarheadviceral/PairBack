@@ -1,15 +1,98 @@
-{% extends "base.html" %}{% block title %}Overview{% endblock %}{% block heading %}Overview{% endblock %}
+{% extends "base.html" %}
+{% block title %}Dashboard{% endblock %}
+{% block heading %}Welcome!{% endblock %}
 {% block content %}
-<section class="welcome"><div class="welcome-copy"><span class="eyebrow light">THE PAIRBACK DESK</span><h2>Lost it?<br><em>Pair it back.</em></h2><p>A familiar bottle. A favorite umbrella. Let's get it back.</p><a class="button white" href="/matching">Review matches</a></div><div class="welcome-art"><div class="orbit orbit-one"></div><div class="orbit orbit-two"></div><img class="eagle-art" src="{{ url_for('static',filename='ateneo-eagle.png') }}" alt="Ateneo eagle silhouette"><span class="float-tag tag-a">FOUND <b>✓</b></span><span class="float-tag tag-b">LOST <b>?</b></span><span class="eagle-caption">BACK WHERE IT BELONGS</span></div></section>
-<div class="section-head"><h3>At a glance</h3><a href="/records" class="text-link">View all records</a></div>
-<div class="stats">
- <div class="stat"><span class="stat-icon blue">▤</span><small>Total reports</small><strong>{{stats.total}}</strong><span class="muted">All submitted records</span></div>
- <div class="stat"><span class="stat-icon amber">⌕</span><small>Lost items</small><strong>{{stats.lost}}</strong><span class="muted">Awaiting a match</span></div>
- <div class="stat"><span class="stat-icon green">✓</span><small>Found items</small><strong>{{stats.found}}</strong><span class="muted">{{stats.available}} currently available</span></div>
- <div class="stat"><span class="stat-icon violet">✓</span><small>Released / resolved</small><strong>{{stats.released}}</strong><span class="muted">Marked completed</span></div>
-</div>
-<div class="section-head"><h3>Recently added</h3><a href="/reports/new" class="text-link">Add report</a></div>
-<div class="panel table-panel"><table><thead><tr><th>REPORT</th><th>TYPE</th><th>CATEGORY</th><th>LOCATION</th><th>DATE</th><th>STATUS</th></tr></thead><tbody>
-{% for r in records %}<tr><td><b>{{r.report_id}}</b><div class="sub">{{r.item_name}}</div></td><td>{{r.report_type}}</td><td>{{r.category}}</td><td>{{r.location}}</td><td>{{r.report_date}}</td><td><span class="pill {{r.status}}">{{r.status}}</span></td></tr>{% else %}<tr><td colspan="6" class="empty">No reports yet. Add your first report to get started.</td></tr>{% endfor %}
-</tbody></table></div>
+  <section class="welcome">
+    <div class="welcome-copy">
+      <span class="eyebrow light">THE PAIRBACK DESK</span>
+      <h2>
+        Lost it?
+        <br>
+        <em>Pair it back.</em>
+      </h2>
+      <p>A familiar bottle. A favorite umbrella. Let's get it back.</p>
+      <a class="button white" href="/matching">Review matches</a>
+    </div>
+    <div class="welcome-art">
+      <div class="orbit orbit-one"></div>
+      <div class="orbit orbit-two"></div>
+      <img class="eagle-art"
+           src="{{ url_for('static',filename='ateneo-eagle.png') }}"
+           alt="Ateneo eagle silhouette">
+      <span class="float-tag tag-a">FOUND <b>✓</b></span>
+      <span class="float-tag tag-b">LOST <b>?</b></span>
+      <span class="eagle-caption">BACK WHERE IT BELONGS</span>
+    </div>
+  </section>
+  <div class="section-head">
+    <h3>At a glance</h3>
+    <a href="/records" class="text-link">View all records</a>
+  </div>
+  <div class="stats">
+    <div class="stat">
+      <span class="stat-icon blue">▤</span>
+      <small>Total reports</small>
+      <strong>{{ stats.total }}</strong>
+      <span class="muted">All submitted records</span>
+    </div>
+    <div class="stat">
+      <span class="stat-icon amber">⌕</span>
+      <small>Lost items</small>
+      <strong>{{ stats.lost }}</strong>
+      <span class="muted">Awaiting a match</span>
+    </div>
+    <div class="stat">
+      <span class="stat-icon green">✓</span>
+      <small>Found items</small>
+      <strong>{{ stats.found }}</strong>
+      <span class="muted">{{ stats.available }} currently available</span>
+    </div>
+    <div class="stat">
+      <span class="stat-icon violet">✓</span>
+      <small>Released / resolved</small>
+      <strong>{{ stats.released }}</strong>
+      <span class="muted">Marked completed</span>
+    </div>
+  </div>
+  <div class="section-head">
+    <h3>Recently added</h3>
+    <a href="/reports/new" class="text-link">Add report</a>
+  </div>
+  <div class="panel table-panel">
+    <table>
+      <thead>
+        <tr>
+          <th>REPORT</th>
+          <th>TYPE</th>
+          <th>CATEGORY</th>
+          <th>LOCATION</th>
+          <th>DATE</th>
+          <th>STATUS</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for report in records %}
+          <tr>
+            <td>
+              <b>{{ report.report_id }}</b>
+              <div class="sub">{{ report.item_name }}</div>
+            </td>
+            <td>{{ report.report_type }}</td>
+            <td>{{ report.category }}</td>
+            <td>{{ report.location }}</td>
+            <td>{{ report.report_date }}</td>
+            <td>
+              <span class="pill {{ report.status }}">{{ report.status }}</span>
+            </td>
+          </tr>
+        {% else %}
+          <tr>
+            <td colspan="6" class="empty">
+              No reports yet. Add your first report to get started.
+            </td>
+          </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
 {% endblock %}

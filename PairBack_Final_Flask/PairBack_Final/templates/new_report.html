@@ -53,7 +53,19 @@
           </span>
           <select name="category" required>
             <option value="">Choose category</option>
-            {% for category in ['Bottle','Electronics','Bag','Clothing','Umbrella','Notebook','Keys','Wallet','Accessories','Other'] %}
+            {% set categories = [
+              'Bottle',
+              'Electronics',
+              'Bag',
+              'Clothing',
+              'Umbrella',
+              'Notebook',
+              'Keys',
+              'Wallet',
+              'Accessories',
+              'Other'
+            ] %}
+            {% for category in categories %}
               <option>{{ category }}</option>
             {% endfor %}
           </select>
@@ -86,7 +98,9 @@
                  placeholder="Choose or type an area">
           <datalist id="room-options">
           </datalist>
-          <small class="muted">Leave blank if unknown. Suggested rooms can be edited.</small>
+          <small class="muted">
+            Leave blank if unknown. Suggested rooms can be edited.
+          </small>
         </label>
         <label>
           <span class="field-label">Date lost or found <span>*</span>
@@ -120,7 +134,9 @@
         </label>
         <label class="full">
           Additional description
-          <textarea name="description" rows="3" placeholder="Distinctive features, marks, contents, or other identifying details">
+          <textarea name="description"
+                    rows="3"
+                    placeholder="Distinctive features, marks, contents, or other identifying details">
 </textarea>
         </label>
       </div>
@@ -173,6 +189,8 @@
     input.addEventListener("change", updateReportRules)
   );
   updateReportRules();
-  if (new URLSearchParams(location.search).get("channel") === "email") intake.value = "Email";
+  if (new URLSearchParams(location.search).get("channel") === "email") {
+    intake.value = "Email";
+  }
   </script>
 {% endblock %}

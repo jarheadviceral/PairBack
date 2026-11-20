@@ -17,7 +17,14 @@
         </span>
       </a>
       <nav aria-label="Main navigation">
-        {% for path,label in [('/', 'Overview'),('/records','Records'),('/intake','Add reports'),('/matching','Matches'),('/dsws','About DSWS')] %}
+        {% set navigation = [
+          ('/', 'Dashboard'),
+          ('/records', 'Records'),
+          ('/intake', 'Add reports'),
+          ('/matching', 'Matches'),
+          ('/dsws', 'About DSWS')
+        ] %}
+        {% for path,label in navigation %}
           <a href="{{ path }}"
              {% if request.path == path %}aria-current="page"{% endif %}>{{ label }}</a>
         {% endfor %}
@@ -37,7 +44,7 @@
       <header class="topbar">
         <div>
           <span class="eyebrow">ATENEO DSWS</span>
-          <h1>{% block heading %}Overview{% endblock %}</h1>
+          <h1>{% block heading %}Welcome!{% endblock %}</h1>
         </div>
         <a class="button primary" href="/reports/new">New report</a>
       </header>
@@ -52,7 +59,8 @@
       {% endwith %}
       {% block content %}{% endblock %}
       <footer>
-        PAIRBACK · Matching assistance for campus lost-and-found staff <span>Developed by Black and Yellow</span>
+        PAIRBACK · Matching assistance for campus lost-and-found staff
+        <span>Developed by Black and Yellow</span>
       </footer>
     </main>
   </body>

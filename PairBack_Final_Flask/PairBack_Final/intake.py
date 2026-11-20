@@ -1,34 +1,67 @@
 """Reviewed CSV intake; validate the whole batch before changing the live store."""
+
 import csv
 import io
 import tempfile
 from pathlib import Path
-from pairback import PairBack, FIELDS
-from data_structures import ArrayList
 
-IMPORT_FIELDS = ["item_name", "category", "color", "brand", "location", "report_date", "report_time", "description"]
-REQUIRED = {"item_name", "category", "color", "location", "report_date", "report_time"}
+from data_structures import ArrayList
+from pairback import PairBack
+
+IMPORT_FIELDS = [
+    "item_name",
+    "category",
+    "color",
+    "brand",
+    "location",
+    "report_date",
+    "report_time",
+    "description",
+]
+REQUIRED = {
+    "item_name",
+    "category",
+    "color",
+    "location",
+    "report_date",
+    "report_time",
+}
+
 
 def parse_csv(content):
     reader = csv.DictReader(io.StringIO(content))
     if not reader.fieldnames or not REQUIRED.issubset(reader.fieldnames):
-        raise ValueError("Use the CSV template headers. Required: " + ", ".join(sorted(REQUIRED)))
+        required = ", ".join(sorted(REQUIRED))
+        raise ValueError(f"Use the CSV template headers. Required: {required}")
     rows = []
     for index, row in enumerate(reader, 2):
         if index > 501:
             raise ValueError("Import at most 500 rows at a time.")
         if None in row or any(value is None for value in row.values()):
-            raise ValueError(f"Row {index}: column count does not match the headers.")
-        rows.append({field: row.get(field, "").strip() for field in IMPORT_FIELDS})
+            raise ValueError(
+                f"Row {index}: column count does not match the headers."
+            )
+        rows.append(
+            {field: row.get(field, "").strip() for field in IMPORT_FIELDS}
+        )
     if not rows:
         raise ValueError("The CSV has no data rows.")
     return rows
 
+
 def fingerprint(row):
-    return tuple(row.get(field, "").strip().casefold() for field in IMPORT_FIELDS)
+    return tuple(
+        row.get(field, "").strip().casefold()
+        for field in IMPORT_FIELDS
+    )
+
 
 def prepare_batch(store, rows):
-    seen = {fingerprint(r) for r in store.all_records() if r["report_type"] == "Lost"}
+    seen = {
+        fingerprint(record)
+        for record in store.all_records()
+        if record["report_type"] == "Lost"
+    }
     added, skipped = [], 0
     with tempfile.TemporaryDirectory() as directory:
         staged = PairBack(Path(directory) / "records.json", seed=False)
@@ -38,13 +71,18 @@ def prepare_batch(store, rows):
             if key in seen:
                 skipped += 1
                 continue
-            payload = dict(row, report_type="Lost", intake_channel="Online Lost Items Report Form")
+            payload = dict(
+                row,
+                report_type="Lost",
+                intake_channel="Online Lost Items Report Form",
+            )
             try:
                 added.append(staged.add(payload))
             except ValueError as error:
                 raise ValueError(f"Row {index}: {error}") from error
             seen.add(key)
     return added, skipped
+
 
 def commit_batch(store, rows):
     added, skipped = prepare_batch(store, rows)

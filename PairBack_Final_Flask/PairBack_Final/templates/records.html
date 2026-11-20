@@ -55,11 +55,15 @@
             </td>
             <td>
               {{ report.location }}
-              <div class="sub">{{ report.report_date }} · {{ report.report_time }}</div>
+              <div class="sub">
+                {{ report.report_date }} · {{ report.report_time }}
+              </div>
             </td>
             <td>
               {{ report.intake_channel }}
-              <div class="sub">{{ report.custody_location or 'No physical custody' }}</div>
+              <div class="sub">
+                {{ report.custody_location or 'No physical custody' }}
+              </div>
             </td>
             <td>
               <span class="pill {{ report.status }}">{{ report.status }}</span>
@@ -72,7 +76,9 @@
                   <select name="status">
                     {% for option in ['open','resolved'] %}
                       <option value="{{ option }}"
-                              {{ 'selected' if report.status == option else '' }}>{{ option }}</option>
+                              {{ 'selected' if report.status == option else '' }}>
+                        {{ option }}
+                      </option>
                     {% endfor %}
                   </select>
                   <button class="mini-button">Save</button>

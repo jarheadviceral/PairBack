@@ -5,9 +5,17 @@ endpoint. These are suggestions, not a verified inventory of existing rooms.
 """
 
 ROOM_LIMITS = {
-    "MVP": 415, "SOM": 402, "CTC": 410, "SEC A": 215,
-    "SEC B": 215, "SEC C": 215, "G": 312, "B": 310,
-    "Bel": 313, "F": 327, "FA Annex": 211,
+    "MVP": 415,
+    "SOM": 402,
+    "CTC": 410,
+    "SEC A": 215,
+    "SEC B": 215,
+    "SEC C": 215,
+    "G": 312,
+    "B": 310,
+    "Bel": 313,
+    "F": 327,
+    "FA Annex": 211,
 }
 
 
@@ -20,17 +28,29 @@ def room_choices(last_room):
     ]
 
 
-LOCATIONS = {building: room_choices(limit) for building, limit in ROOM_LIMITS.items()}
+LOCATIONS = {
+    building: room_choices(limit)
+    for building, limit in ROOM_LIMITS.items()
+}
 LOCATIONS["MVP"].append("Roofdeck")
 LOCATIONS["SEC A"].append("Escaler Hall")
 LOCATIONS["Gonzaga Cafeteria"] = ["GONZ 1", "GONZ 2"]
 LOCATIONS["New Rizal Library"] = [f"Floor {floor}" for floor in range(1, 6)]
 LOCATIONS["Old Rizal Library"] = ["Floor 1", "Floor 2"]
 for name in [
-    "Leong Hall Auditorium", "Red Brick Road", "SEC Walk",
-    "Eliazo Dormitory", "Cervini Dormitory", "IRH",
-    "College Covered Courts", "JSEC", "Arete", "North Carpark",
-    "Central Carpark", "Upper East Carpark", "Lower East Carpark",
+    "Leong Hall Auditorium",
+    "Red Brick Road",
+    "SEC Walk",
+    "Eliazo Dormitory",
+    "Cervini Dormitory",
+    "IRH",
+    "College Covered Courts",
+    "JSEC",
+    "Arete",
+    "North Carpark",
+    "Central Carpark",
+    "Upper East Carpark",
+    "Lower East Carpark",
 ]:
     LOCATIONS[name] = []
 

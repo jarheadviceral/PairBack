@@ -101,7 +101,13 @@ class PairBackTests(unittest.TestCase):
             original_candidates = candidates[:]
             self.assertEqual(
                 insertion_sort(candidates, self.app._candidate_has_higher_priority),
-                sorted(candidates, key=lambda x: (-x["score"], x["record"]["report_id"])),
+                sorted(
+                    candidates,
+                    key=lambda item: (
+                        -item["score"],
+                        item["record"]["report_id"],
+                    ),
+                ),
             )
             self.assertEqual(candidates, original_candidates)
 
@@ -183,10 +189,15 @@ class PairBackTests(unittest.TestCase):
 
     def test_insertion_sort_is_stable_and_linear_on_ordered_input(self):
         calls = []
-        values = [{"score": score, "order": i} for i, score in enumerate([3, 3, 2, 1])]
+        values = [
+            {"score": score, "order": index}
+            for index, score in enumerate([3, 3, 2, 1])
+        ]
+
         def higher(a, b):
             calls.append(1)
             return a["score"] > b["score"]
+
         self.assertEqual(insertion_sort(values, higher), values)
         self.assertEqual(len(calls), len(values) - 1)
         shuffled = [values[2], values[0], values[3], values[1]]
