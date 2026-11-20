@@ -48,7 +48,7 @@ SAMPLE_RECORDS = [
         "category": "Bottle",
         "color": "Blue",
         "brand": "Hydro Flask",
-        "location": "Library",
+        "location": "New Rizal Library · Floor 3",
         "report_date": "2026-11-15",
         "report_time": "14:30",
         "intake_channel": "Online Lost Items Report Form",
@@ -63,7 +63,7 @@ SAMPLE_RECORDS = [
         "category": "Bottle",
         "color": "Blue",
         "brand": "Hydro Flask",
-        "location": "Library",
+        "location": "New Rizal Library · Floor 3",
         "report_date": "2026-11-16",
         "report_time": "09:15",
         "intake_channel": "In Person - MVP 101",
@@ -78,7 +78,7 @@ SAMPLE_RECORDS = [
         "category": "Umbrella",
         "color": "Black",
         "brand": "Generic",
-        "location": "Main Gate",
+        "location": "SEC A · Escaler Hall",
         "report_date": "2026-11-17",
         "report_time": "17:00",
         "intake_channel": "Email",
@@ -93,7 +93,7 @@ SAMPLE_RECORDS = [
         "category": "Umbrella",
         "color": "Black",
         "brand": "Generic",
-        "location": "Cafeteria",
+        "location": "Gonzaga Cafeteria · GONZ 2",
         "report_date": "2026-11-17",
         "report_time": "18:10",
         "intake_channel": "OADSA Turnover - Xavier Hall",
@@ -108,7 +108,7 @@ SAMPLE_RECORDS = [
         "category": "Notebook",
         "color": "Red",
         "brand": "Muji",
-        "location": "Classroom Building",
+        "location": "SOM · 201",
         "report_date": "2026-11-12",
         "report_time": "11:20",
         "intake_channel": "In Person - MVP 101",
@@ -123,7 +123,7 @@ SAMPLE_RECORDS = [
         "category": "Notebook",
         "color": "Red",
         "brand": "Muji",
-        "location": "Classroom Building",
+        "location": "SOM · 201",
         "report_date": "2026-11-13",
         "report_time": "08:40",
         "intake_channel": "In Person - MVP 101",
@@ -180,10 +180,25 @@ class PairBack:
         else:
             raw_records = SAMPLE_RECORDS if seed else []
 
+        # Refresh only exact, unedited legacy demo records. User-entered or
+        # modified records are never matched by ID alone.
+        old_locations = {
+            "L001": "Library", "F001": "Library", "L002": "Main Gate",
+            "F002": "Cafeteria", "L003": "Classroom Building",
+            "F003": "Classroom Building",
+        }
+        refreshed = False
+        for raw in raw_records:
+            for sample in SAMPLE_RECORDS:
+                legacy = dict(sample, location=old_locations[sample["report_id"]])
+                if raw == legacy:
+                    raw["location"] = sample["location"]
+                    refreshed = True
+                    break
         self.records = ArrayList(
             self._normalize_record(record) for record in raw_records
         )
-        if not self.data_file.exists() and seed:
+        if refreshed or (not self.data_file.exists() and seed):
             self._save()
 
     def all_records(self):
