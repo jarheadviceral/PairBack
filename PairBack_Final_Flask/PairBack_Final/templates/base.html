@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 <!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
 <title>{% block title %}PairBack{% endblock %} · PairBack</title>
 <link rel="stylesheet" href="{{ url_for('static',filename='style.css') }}"></head><body>
@@ -15,3 +16,64 @@
 {% block content %}{% endblock %}
 <footer>PAIRBACK · Matching assistance for campus lost-and-found staff <span>Developed by Black and Yellow</span></footer></main>
 </body></html>
+=======
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>{% block title %}PairBack{% endblock %} · PairBack</title>
+    <link rel="stylesheet" href="{{ url_for('static',filename='style.css') }}">
+  </head>
+  <body>
+    <header class="site-nav">
+      <a class="brand" href="/">
+        <img src="{{ url_for('static',filename='pairback-logo.png') }}"
+             alt=""
+             width="40"
+             height="40">
+        <span>pairback<small>CAMPUS LOST &amp; FOUND</small>
+        </span>
+      </a>
+      <nav aria-label="Main navigation">
+        {% for path,label in [('/', 'Overview'),('/records','Records'),('/intake','Add reports'),('/matching','Matches'),('/dsws','About DSWS')] %}
+          <a href="{{ path }}"
+             {% if request.path == path %}aria-current="page"{% endif %}>{{ label }}</a>
+        {% endfor %}
+        <details class="tools-menu">
+          <summary>Tools</summary>
+          <div>
+            <a href="/search">Find by ID</a>
+            <a href="/export">Export CSV</a>
+            <form action="/undo" method="post">
+              <button class="undo-link">Undo latest change ({{ undo_count }})</button>
+            </form>
+          </div>
+        </details>
+      </nav>
+    </header>
+    <main class="main">
+      <header class="topbar">
+        <div>
+          <span class="eyebrow">CAMPUS OPERATIONS</span>
+          <h1>{% block heading %}Overview{% endblock %}</h1>
+        </div>
+        <a class="button primary" href="/reports/new">New report</a>
+      </header>
+      {% with messages=get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+          <div class="alerts">
+            {% for category,message in messages %}
+              <div class="alert {{ category }}">{{ message }}</div>
+            {% endfor %}
+          </div>
+        {% endif %}
+      {% endwith %}
+      {% block content %}{% endblock %}
+      <footer>
+        PAIRBACK · Matching assistance for campus lost-and-found staff <span>Developed by Black and Yellow</span>
+      </footer>
+    </main>
+  </body>
+</html>
+>>>>>>> 89b881e362ffb0a4ab460dfa9f237b63d45bbf6e

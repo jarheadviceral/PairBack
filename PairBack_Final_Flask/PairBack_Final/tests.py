@@ -3,7 +3,7 @@ import unittest
 import random
 from pathlib import Path
 
-from data_structures import ArrayList, UndoStack, heap_sort, quick_sort
+from data_structures import ArrayList, UndoStack, insertion_sort, quick_sort
 from pairback import PairBack, SAMPLE_RECORDS
 
 
@@ -100,7 +100,7 @@ class PairBackTests(unittest.TestCase):
             rng.shuffle(candidates)
             original_candidates = candidates[:]
             self.assertEqual(
-                heap_sort(candidates, self.app._candidate_has_higher_priority),
+                insertion_sort(candidates, self.app._candidate_has_higher_priority),
                 sorted(candidates, key=lambda x: (-x["score"], x["record"]["report_id"])),
             )
             self.assertEqual(candidates, original_candidates)
@@ -153,7 +153,7 @@ class PairBackTests(unittest.TestCase):
             list(range(count)),
         )
 
-    def test_heap_sort_orders_score_then_smaller_id(self):
+    def test_insertion_sort_orders_score_then_smaller_id(self):
         def higher(first, second):
             if first["score"] != second["score"]:
                 return first["score"] > second["score"]
@@ -164,22 +164,33 @@ class PairBackTests(unittest.TestCase):
             {"id": "F002", "score": 90},
             {"id": "F001", "score": 90},
         ]
-        ordered = heap_sort(candidates, higher)
+        ordered = insertion_sort(candidates, higher)
         self.assertEqual(
             [candidate["id"] for candidate in ordered],
             ["F001", "F002", "F003"],
         )
 
-    def test_heap_sort_handles_empty_and_large_inputs(self):
+    def test_insertion_sort_handles_empty_and_large_inputs(self):
         def higher(first, second):
             return first > second
 
-        self.assertEqual(heap_sort([], higher), [])
+        self.assertEqual(insertion_sort([], higher), [])
         values = list(range(5001))
         self.assertEqual(
-            heap_sort(values, higher),
+            insertion_sort(values, higher),
             list(range(5000, -1, -1)),
         )
+
+    def test_insertion_sort_is_stable_and_linear_on_ordered_input(self):
+        calls = []
+        values = [{"score": score, "order": i} for i, score in enumerate([3, 3, 2, 1])]
+        def higher(a, b):
+            calls.append(1)
+            return a["score"] > b["score"]
+        self.assertEqual(insertion_sort(values, higher), values)
+        self.assertEqual(len(calls), len(values) - 1)
+        shuffled = [values[2], values[0], values[3], values[1]]
+        self.assertEqual(insertion_sort(shuffled, higher), values)
 
     def test_add_duplicate_validation_and_persistence(self):
         first = self.app.add(self.lost_payload())
@@ -206,7 +217,7 @@ class PairBackTests(unittest.TestCase):
         with self.assertRaises(ValueError):
             self.app.add(invalid_found)
 
-    def test_matching_uses_correct_date_weight_and_heap_order(self):
+    def test_matching_uses_correct_date_weight_and_insertion_order(self):
         lost = self.app.add(self.lost_payload())
         first = self.app.add(self.found_payload())
         second = self.app.add(

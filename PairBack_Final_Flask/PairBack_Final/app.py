@@ -115,7 +115,7 @@ def matching():
     results = []
     if selected:
         try:
-            # Final-project algorithm 2: Heap Sort candidate ranking.
+            # Final-project algorithm 2: Insertion Sort candidate ranking.
             results = store.matches(selected)
         except ValueError as error:
             flash(str(error), "error")

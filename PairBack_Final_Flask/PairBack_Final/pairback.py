@@ -5,7 +5,7 @@ import json
 from datetime import date, time
 from pathlib import Path
 
-from data_structures import ArrayList, UndoStack, heap_sort, quick_sort
+from data_structures import ArrayList, UndoStack, insertion_sort, quick_sort
 from locations import compose_location, location_key
 
 
@@ -440,7 +440,7 @@ class PairBack:
                 {"record": found, "score": score, "reasons": reasons}
             )
 
-        return heap_sort(
+        return insertion_sort(
             candidates,
             higher_priority=self._candidate_has_higher_priority,
         )

@@ -17,8 +17,8 @@ The prototype follows the stated DSWS workflow:
 
 ## Final-project algorithms
 
-The app uses three algorithms: Quick Sort, Heap Sort, and Linear Search /
-Traversal. Quick Sort and Heap Sort are the two new algorithms; Linear Search
+The app uses three algorithms: Quick Sort, Insertion Sort, and Linear Search /
+Traversal. Quick Sort and Insertion Sort are the two new algorithms; Linear Search
 is retained from Coding Assignment 2.
 
 ### 1. Quick Sort
@@ -33,17 +33,15 @@ the stack bounded and avoids Python recursion-limit failures.
 - Additional space: O(n) for the returned copy plus O(log n) partition-stack
   space when the smaller partition is processed first
 
-### 2. Heap Sort
+### 2. Insertion Sort
 
-The heap_sort function uses the student-built MaxHeap class to rank possible
-matches. It constructs the candidate heap bottom-up according to match score.
-Repeated removal returns the highest-scoring candidate first. A smaller report
-ID wins when scores are equal.
+The insertion_sort function shifts lower-priority candidates right to insert
+each candidate into its ordered position. Scores are descending; ties use
+report ID ascending. Equal-priority entries retain their input order.
 
-- Bottom-up heap construction: O(k)
-- Remove all ranked candidates: O(k log k)
-- Peek at strongest candidate: O(1)
-- Additional space: O(k)
+- Best time: O(k) for already ordered input
+- Average/worst time: O(k^2)
+- Additional space: O(k) for the returned copy; O(1) for the insertion loop
 
 ### 3. Linear Search / Traversal (retained from Coding Assignment 2)
 
@@ -51,9 +49,9 @@ Exact report-ID lookup scans the ArrayList and returns the matching record,
 or None when absent. It takes O(n) worst-case time and O(1) auxiliary space.
 Record filtering and matching also traverse records sequentially. Matching
 scans all n reports and stores k eligible candidates: O(n) scan time and
-O(k) candidate storage before Heap Sort ranks them.
+O(k) candidate storage before Insertion Sort ranks them.
 
-Quick Sort and Heap Sort remain the two new final-project algorithms.
+Quick Sort and Insertion Sort remain the two new final-project algorithms.
 Linear Search / Traversal is the retained supporting algorithm.
 Merge Sort and Binary Search are not used.
 
@@ -66,10 +64,6 @@ Merge Sort and Binary Search are not used.
   backed by ArrayList. Push is amortized O(1); pop and peek are O(1).
   Empty pop and peek return None. History is kept for the current session.
 
-MaxHeap is an additional internal helper data structure used by Heap Sort,
-not one of the two primary structures above. Its array-backed heap is built
-bottom-up and repeatedly extracts the highest-priority candidate. This is an
-O(k)-space heap-based sort, not the O(1)-space in-place variant.
 There is no report-ID dictionary index: PairBack.find performs Linear Search.
 
 ### Implementation map
@@ -77,14 +71,14 @@ There is no report-ID dictionary index: PairBack.find performs Linear Search.
 | Component | Implementation | Application |
 | --- | --- | --- |
 | Quick Sort | data_structures.quick_sort | PairBack.sorted_records; record directory |
-| Heap Sort | data_structures.heap_sort | PairBack.matches; score descending, ID ascending |
+| Insertion Sort | data_structures.insertion_sort | PairBack.matches; score descending, ID ascending |
 | Linear Search / Traversal | PairBack.find; app.records; PairBack.matches | Exact ID lookup, filtering, candidate scan |
 | ArrayList | data_structures.ArrayList | PairBack.records; backing storage for UndoStack |
 | UndoStack | data_structures.UndoStack | PairBack.set_status, release, and undo |
 
 IDs are compared lexicographically as strings. Sorting returns a new list and
 does not rearrange the stored ArrayList. A missing ID returns None. The full
-matching operation costs O(n + k log k), where n is all stored reports and k
+matching operation costs O(n + k^2) in the worst case, where n is all stored reports and k
 is eligible found reports. Undo is O(n) overall because it searches for the
 record, even though the stack pop itself is O(1); saving also processes n
 records. The five matching weights are fixed, so scoring one candidate is O(1).
@@ -121,7 +115,7 @@ not an AI prediction and not proof of ownership.
 - Automatic report IDs and duplicate prevention
 - DSWS-aligned intake and custody validation
 - Explainable weighted matching
-- Heap-Sort candidate ranking
+- Insertion-Sort candidate ranking
 - Quick-Sort record directory
 - Verified release at MVP 101
 - Undo for status changes and releases
@@ -151,8 +145,8 @@ The tests cover:
 - UndoStack LIFO behavior
 - Quick Sort ordering
 - Quick Sort empty, duplicate, and adversarial 1,100-item limits
-- Heap Sort ranking and tie-breaking
-- Heap Sort empty and 5,001-item input limits
+- Insertion Sort ranking and tie-breaking
+- Insertion Sort empty and 5,001-item input limits
 - Duplicate report prevention and JSON persistence
 - DSWS intake rules
 - Matching weights
@@ -167,4 +161,4 @@ result.
 
 ## Prototype assumptions
 
-MVP 101 release and intake validation are prototype workflow choices based on the supplied DSWS context, not an official policy certification. Online forms and email are recorded as intake channels only; no integration or messages are sent. Existing records with missing time or custody retain unknown values. Exact opening hours are not enforced because they were not supplied. Confirm Quick Sort and Heap Sort eligibility against the course slides before submission.
+MVP 101 release and intake validation are prototype workflow choices based on the supplied DSWS context, not an official policy certification. Online forms and email are recorded as intake channels only; no integration or messages are sent. Existing records with missing time or custody retain unknown values. Exact opening hours are not enforced because they were not supplied. Quick Sort and Insertion Sort are explicitly covered in the supplied course slides. Linear Search remains a supporting operation and is not counted toward the two required algorithms.

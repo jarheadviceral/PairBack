@@ -1,4 +1,19 @@
-# PairBack — Coding Assignment 2
+# PairBack — Final Project
+
+The current Flask application is in [PairBack_Final_Flask/PairBack_Final](PairBack_Final_Flask/PairBack_Final/README.md).
+It uses Quick Sort and Insertion Sort as its two required algorithms,
+with Linear Search as a supporting operation, plus ArrayList and UndoStack.
+
+Run from that directory:
+
+```sh
+python -m pip install -r requirements.txt
+python app.py
+```
+
+The notes below describe the archived Coding Assignment 2 demonstration.
+
+## Coding Assignment 2 (historical)
 
 ## Run
 Extract this folder, open a terminal there, and run:
