@@ -13,5 +13,5 @@
 <main class="main"><header class="topbar"><div><span class="eyebrow">CAMPUS OPERATIONS</span><h1>{% block heading %}Overview{% endblock %}</h1></div><a class="button primary" href="/reports/new">New report</a></header>
 {% with messages=get_flashed_messages(with_categories=true) %}{% if messages %}<div class="alerts">{% for category,message in messages %}<div class="alert {{category}}">{{message}}</div>{% endfor %}</div>{% endif %}{% endwith %}
 {% block content %}{% endblock %}
-<footer>PAIRBACK · Matching assistance for campus lost-and-found staff <span>Ownership must be verified before release.</span></footer></main>
+<footer>PAIRBACK · Matching assistance for campus lost-and-found staff <span>Developed by Black and Yellow</span></footer></main>
 </body></html>
