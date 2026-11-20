@@ -1,5 +1,6 @@
 import tempfile
 import unittest
+import random
 from pathlib import Path
 
 from data_structures import ArrayList, UndoStack, heap_sort, quick_sort
@@ -65,6 +66,12 @@ class PairBackTests(unittest.TestCase):
         self.assertGreaterEqual(values.capacity, 1000)
         with self.assertRaises(IndexError):
             _ = values[-1]
+        for number in reversed(range(1000)):
+            self.assertEqual(values.pop_last(), number)
+        with self.assertRaises(IndexError):
+            values.pop_last()
+        values.append("reused")
+        self.assertEqual(values[0], "reused")
 
     def test_undo_stack_lifo(self):
         stack = UndoStack()
@@ -76,6 +83,39 @@ class PairBackTests(unittest.TestCase):
             list(reversed(range(10))),
         )
         self.assertTrue(stack.is_empty())
+        self.assertIsNone(stack.pop())
+        self.assertIsNone(stack.peek())
+
+    def test_randomized_sorting_preserves_input_and_all_candidates(self):
+        rng = random.Random(42)
+        for size in [0, 1, 2, 17, 100, 1000]:
+            values = [rng.randrange(20) for _ in range(size)]
+            original = values[:]
+            self.assertEqual(quick_sort(values, key=lambda x: x), sorted(values))
+            self.assertEqual(values, original)
+            candidates = [
+                {"score": value, "record": {"report_id": f"F{i:04d}"}}
+                for i, value in enumerate(values)
+            ]
+            rng.shuffle(candidates)
+            original_candidates = candidates[:]
+            self.assertEqual(
+                heap_sort(candidates, self.app._candidate_has_higher_priority),
+                sorted(candidates, key=lambda x: (-x["score"], x["record"]["report_id"])),
+            )
+            self.assertEqual(candidates, original_candidates)
+
+    def test_application_undo_reverses_changes_in_lifo_order(self):
+        first = self.app.add(self.lost_payload())
+        second = self.app.add(self.lost_payload())
+        self.app.set_status(first["report_id"], "resolved")
+        self.app.set_status(second["report_id"], "resolved")
+        self.app.undo()
+        self.assertEqual(second["status"], "open")
+        self.assertEqual(first["status"], "resolved")
+        self.app.undo()
+        self.assertEqual(first["status"], "open")
+        self.assertIsNone(self.app.undo())
 
     def test_quick_sort_orders_records_without_changing_input(self):
         records = [

@@ -17,8 +17,9 @@ The prototype follows the stated DSWS workflow:
 
 ## Final-project algorithms
 
-The two algorithms counted for the final project are different from the
-algorithms submitted in the earlier coding assignments.
+The app uses three algorithms: Quick Sort, Heap Sort, and Linear Search /
+Traversal. Quick Sort and Heap Sort are the two new algorithms; Linear Search
+is retained from Coding Assignment 2.
 
 ### 1. Quick Sort
 
@@ -56,12 +57,37 @@ Quick Sort and Heap Sort remain the two new final-project algorithms.
 Linear Search / Traversal is the retained supporting algorithm.
 Merge Sort and Binary Search are not used.
 
-## Data structures
+## Two primary data structures
 
-- ArrayList: stores all report records and grows by doubling capacity.
-- UndoStack: stores status changes using Last-In, First-Out behavior.
-- MaxHeap: stores match candidates according to priority.
-- Report-ID dictionary: supports exact record retrieval.
+- ArrayList: stores all report records in explicitly allocated slots, with a
+  size counter and capacity doubling. Indexed access is O(1); append is
+  amortized O(1), with O(n) copying during growth. pop_last is O(1).
+- UndoStack: stores status changes and releases in Last-In, First-Out order,
+  backed by ArrayList. Push is amortized O(1); pop and peek are O(1).
+  Empty pop and peek return None. History is kept for the current session.
+
+MaxHeap is an additional internal helper data structure used by Heap Sort,
+not one of the two primary structures above. Its array-backed heap is built
+bottom-up and repeatedly extracts the highest-priority candidate. This is an
+O(k)-space heap-based sort, not the O(1)-space in-place variant.
+There is no report-ID dictionary index: PairBack.find performs Linear Search.
+
+### Implementation map
+
+| Component | Implementation | Application |
+| --- | --- | --- |
+| Quick Sort | data_structures.quick_sort | PairBack.sorted_records; record directory |
+| Heap Sort | data_structures.heap_sort | PairBack.matches; score descending, ID ascending |
+| Linear Search / Traversal | PairBack.find; app.records; PairBack.matches | Exact ID lookup, filtering, candidate scan |
+| ArrayList | data_structures.ArrayList | PairBack.records; backing storage for UndoStack |
+| UndoStack | data_structures.UndoStack | PairBack.set_status, release, and undo |
+
+IDs are compared lexicographically as strings. Sorting returns a new list and
+does not rearrange the stored ArrayList. A missing ID returns None. The full
+matching operation costs O(n + k log k), where n is all stored reports and k
+is eligible found reports. Undo is O(n) overall because it searches for the
+record, even though the stack pop itself is O(1); saving also processes n
+records. The five matching weights are fixed, so scoring one candidate is O(1).
 
 ## Matching rule
 
