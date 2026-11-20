@@ -91,13 +91,25 @@ records. The five matching weights are fixed, so scoring one candidate is O(1).
 
 ## Matching rule
 
-Each exact, non-empty, case-insensitive match receives a fixed weight:
+Each non-empty, case-insensitive match receives a fixed weight. Location uses
+the building when recognized; other fields use exact equality:
 
 - Category: 30
 - Color: 25
 - Brand: 20
 - Location: 15
 - Date lost/found: 10
+
+New reports select a building and optionally enter a room, floor, or area.
+The combined location (for example, MVP · 101) is saved and exported.
+CSV imports retain their location column; use the same combined format.
+Existing free-text locations are preserved.
+
+Room suggestions come from the team's ranges in locations.py. Intermediate
+floors suggest 01–15; the final floor stops at the supplied endpoint. These
+are not a verified room inventory, so custom room or area entries are allowed.
+Known buildings receive the location weight even when rooms differ. Full
+locations remain visible in the comparison for staff review.
 
 The weights total 100. The score is a transparent project-defined heuristic,
 not an AI prediction and not proof of ownership.

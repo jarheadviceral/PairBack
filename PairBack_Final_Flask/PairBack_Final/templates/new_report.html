@@ -69,8 +69,18 @@
       </label>
 
       <label>
-        Location lost or found <span>*</span>
-        <input name="location" required placeholder="e.g. Rizal Library">
+        Building / campus location <span>*</span>
+        <select name="building" id="building" required>
+          <option value="">Choose a location</option>
+          {% for building in campus_locations %}<option>{{ building }}</option>{% endfor %}
+        </select>
+      </label>
+
+      <label>
+        Room / floor / specific area (optional)
+        <input name="room" id="room" list="room-options" maxlength="80" placeholder="Choose or type an area">
+        <datalist id="room-options"></datalist>
+        <small class="muted">Leave blank if unknown. Suggested rooms can be edited.</small>
       </label>
 
       <label>
@@ -121,6 +131,21 @@
 </div>
 
 <script>
+  const campusLocations = {{ campus_locations|tojson }};
+  const buildingSelect = document.getElementById("building");
+  const roomInput = document.getElementById("room");
+  const roomOptions = document.getElementById("room-options");
+  function updateRooms() {
+    roomInput.value = "";
+    roomOptions.replaceChildren();
+    for (const room of campusLocations[buildingSelect.value] || []) {
+      const option = document.createElement("option");
+      option.value = room;
+      roomOptions.appendChild(option);
+    }
+  }
+  buildingSelect.addEventListener("change", updateRooms);
+  updateRooms();
   const typeInputs = document.querySelectorAll('input[name="report_type"]');
   const intake = document.getElementById("intake_channel");
   const custodyGroup = document.getElementById("custody_group");

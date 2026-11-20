@@ -6,6 +6,7 @@ from datetime import date, time
 from pathlib import Path
 
 from data_structures import ArrayList, UndoStack, heap_sort, quick_sort
+from locations import compose_location, location_key
 
 
 BASE_DIR = Path(__file__).resolve().parent
@@ -256,6 +257,10 @@ class PairBack:
             field: str(payload.get(field, "")).strip()
             for field in FIELDS
         }
+        if "building" in payload:
+            clean["location"] = compose_location(
+                payload.get("building", ""), payload.get("room", "")
+            )
 
         for field in required:
             if not clean[field]:
@@ -396,6 +401,9 @@ class PairBack:
             for field, weight in self.WEIGHTS.items():
                 lost_value = lost.get(field, "").strip().casefold()
                 found_value = found.get(field, "").strip().casefold()
+                if field == "location":
+                    lost_value = location_key(lost_value)
+                    found_value = location_key(found_value)
                 matched = bool(
                     lost_value
                     and found_value

@@ -12,6 +12,7 @@ from flask import (
 )
 
 from pairback import FIELDS, PairBack
+from locations import LOCATIONS
 
 
 app = Flask(__name__)
@@ -99,7 +100,7 @@ def new_report():
             return redirect(url_for("records"))
         except ValueError as error:
             flash(str(error), "error")
-    return render_template("new_report.html")
+    return render_template("new_report.html", campus_locations=LOCATIONS)
 
 
 @app.get("/matching")
