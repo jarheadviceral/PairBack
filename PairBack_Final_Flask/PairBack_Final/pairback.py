@@ -145,7 +145,6 @@ class PairBack:
         self.data_file = Path(data_file)
         self.records = ArrayList()
         self.history = UndoStack()
-        self._record_index = {}
         self.load(seed=seed)
 
     def _normalize_record(self, raw):
@@ -159,13 +158,6 @@ class PairBack:
         if record["report_type"] == "Found" and not record["custody_location"]:
             record["custody_location"] = "Unknown"
         return record
-
-    def _rebuild_index(self):
-        self._record_index = {
-            record["report_id"]: record
-            for record in self.records
-            if record["report_id"]
-        }
 
     def _save(self):
         self.data_file.parent.mkdir(parents=True, exist_ok=True)
@@ -190,7 +182,6 @@ class PairBack:
         self.records = ArrayList(
             self._normalize_record(record) for record in raw_records
         )
-        self._rebuild_index()
         if not self.data_file.exists() and seed:
             self._save()
 
@@ -203,8 +194,12 @@ class PairBack:
         return quick_sort(source, key=lambda record: record["report_id"])
 
     def find(self, report_id):
-        """Exact lookup through an ID index; average O(1)."""
-        return self._record_index.get(str(report_id).strip())
+        """Linear Search: O(n) worst-case time and O(1) auxiliary space."""
+        target = str(report_id).strip()
+        for record in self.records:
+            if record["report_id"] == target:
+                return record
+        return None
 
     def _validate_date_and_time(self, record):
         try:
@@ -283,7 +278,6 @@ class PairBack:
             "open" if clean["report_type"] == "Lost" else "available"
         )
         self.records.append(clean)
-        self._record_index[clean["report_id"]] = clean
         self._save()
         return clean
 

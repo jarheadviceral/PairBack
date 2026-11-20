@@ -46,6 +46,17 @@ class PairBackTests(unittest.TestCase):
             "custody_location": "MVP 101",
         }
 
+    def test_linear_search_empty_unsorted_and_missing_ids(self):
+        self.assertIsNone(self.app.find("F001"))
+        records = [{"report_id": value} for value in ["F003", "F001", "F002"]]
+        for record in records:
+            self.app.records.append(record)
+        for record in records:
+            self.assertIs(self.app.find(record["report_id"]), record)
+        self.assertIs(self.app.find(" F001 "), records[1])
+        self.assertIsNone(self.app.find("F004"))
+        self.assertIsNone(self.app.find("f001"))
+
     def test_arraylist_growth_and_bounds(self):
         values = ArrayList()
         for number in range(1000):
@@ -199,7 +210,6 @@ class PairBackTests(unittest.TestCase):
         for record in SAMPLE_RECORDS:
             normalized = self.app._normalize_record(dict(record))
             self.app.records.append(normalized)
-        self.app._rebuild_index()
 
         before = [
             item["record"]["report_id"]

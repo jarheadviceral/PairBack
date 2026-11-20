@@ -44,10 +44,17 @@ ID wins when scores are equal.
 - Peek at strongest candidate: O(1)
 - Additional space: O(k)
 
-Merge Sort and Binary Search from Coding Assignment 1 are no longer used by
-the final application. The Linear Search demonstrated in Coding Assignment 2
-is also not used for exact report retrieval; PairBack maintains a report-ID
-dictionary index with average O(1) access.
+### 3. Linear Search / Traversal (retained from Coding Assignment 2)
+
+Exact report-ID lookup scans the ArrayList and returns the matching record,
+or None when absent. It takes O(n) worst-case time and O(1) auxiliary space.
+Record filtering and matching also traverse records sequentially. Matching
+scans all n reports and stores k eligible candidates: O(n) scan time and
+O(k) candidate storage before Heap Sort ranks them.
+
+Quick Sort and Heap Sort remain the two new final-project algorithms.
+Linear Search / Traversal is the retained supporting algorithm.
+Merge Sort and Binary Search are not used.
 
 ## Data structures
 

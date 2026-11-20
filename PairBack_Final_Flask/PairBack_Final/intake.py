@@ -33,7 +33,6 @@ def prepare_batch(store, rows):
     with tempfile.TemporaryDirectory() as directory:
         staged = PairBack(Path(directory) / "records.json", seed=False)
         staged.records = ArrayList(dict(r) for r in store.all_records())
-        staged._rebuild_index()
         for index, row in enumerate(rows, 2):
             key = fingerprint(row)
             if key in seen:
@@ -56,5 +55,4 @@ def commit_batch(store, rows):
     except OSError:
         store.records = previous
         raise
-    store._rebuild_index()
     return len(added), skipped
